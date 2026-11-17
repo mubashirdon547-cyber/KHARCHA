@@ -23,9 +23,7 @@
   --radius: 17px;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -35,13 +33,8 @@ body {
   min-height: 100vh;
 }
 
-button, input, select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
+button, input, select { font: inherit; }
+button { cursor: pointer; }
 
 header {
   background: linear-gradient(120deg, #101e38, #142b50);
@@ -70,11 +63,6 @@ header {
   font-size: 13px;
 }
 
-.language-select {
-  width: auto;
-  min-width: 125px;
-}
-
 main {
   max-width: 850px;
   margin: auto;
@@ -92,18 +80,11 @@ input, select {
   outline: none;
 }
 
-input:focus, select:focus {
-  border-color: var(--blue);
-}
-
-input::placeholder {
-  color: #7183a1;
-}
+input:focus, select:focus { border-color: var(--blue); }
+input::placeholder { color: #7183a1; }
 
 input[type="month"],
-input[type="date"] {
-  color-scheme: dark;
-}
+input[type="date"] { color-scheme: dark; }
 
 button {
   border: 0;
@@ -113,18 +94,14 @@ button {
   transition: .2s ease;
 }
 
-button:active {
-  transform: scale(.98);
-}
+button:active { transform: scale(.98); }
 
 .primary {
   background: var(--blue);
   color: white;
 }
 
-.primary:hover {
-  background: #5596ff;
-}
+.primary:hover { background: #5596ff; }
 
 .secondary {
   background: #203453;
@@ -136,6 +113,8 @@ button:active {
   background: #45242d;
   color: #ff9aa4;
 }
+
+.danger:hover { background: #63303b; }
 
 .small-btn {
   padding: 8px 11px;
@@ -168,9 +147,7 @@ button:active {
   white-space: nowrap;
 }
 
-.month-control input {
-  max-width: 190px;
-}
+.month-control input { max-width: 190px; }
 
 .summary-grid {
   display: grid;
@@ -206,17 +183,9 @@ button:active {
   overflow-wrap: anywhere;
 }
 
-.blue-text {
-  color: var(--blue2);
-}
-
-.green-text {
-  color: var(--green);
-}
-
-.red-text {
-  color: var(--red);
-}
+.blue-text { color: var(--blue2); }
+.green-text { color: var(--green); }
+.red-text { color: var(--red); }
 
 .card {
   background: var(--surface);
@@ -242,7 +211,6 @@ button:active {
   background: conic-gradient(var(--blue) 0%, #263650 0%);
   display: grid;
   place-items: center;
-  position: relative;
 }
 
 .ring-inner {
@@ -256,9 +224,7 @@ button:active {
   justify-content: center;
 }
 
-.ring-inner strong {
-  font-size: 25px;
-}
+.ring-inner strong { font-size: 25px; }
 
 .ring-inner span {
   color: var(--muted);
@@ -306,13 +272,8 @@ button:active {
   margin-top: 17px;
 }
 
-.budget-form input {
-  flex: 1;
-}
-
-.budget-form button {
-  white-space: nowrap;
-}
+.budget-form input { flex: 1; }
+.budget-form button { white-space: nowrap; }
 
 .content-grid {
   display: grid;
@@ -326,21 +287,12 @@ form.expense-form {
   gap: 11px;
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
 .category-list {
   display: grid;
   gap: 15px;
 }
 
-.category-item {
-  display: grid;
-  gap: 7px;
-}
+.category-item { display: grid; gap: 7px; }
 
 .category-top {
   display: flex;
@@ -349,9 +301,7 @@ form.expense-form {
   font-size: 13px;
 }
 
-.category-name {
-  color: #dce7fa;
-}
+.category-name { color: #dce7fa; }
 
 .category-value {
   color: var(--muted);
@@ -371,9 +321,7 @@ form.expense-form {
   background: var(--category-color, var(--blue));
 }
 
-.history-list {
-  display: grid;
-}
+.history-list { display: grid; }
 
 .entry {
   display: flex;
@@ -384,13 +332,9 @@ form.expense-form {
   border-bottom: 1px solid var(--border);
 }
 
-.entry:last-child {
-  border-bottom: 0;
-}
+.entry:last-child { border-bottom: 0; }
 
-.entry-main {
-  min-width: 0;
-}
+.entry-main { min-width: 0; }
 
 .entry-title {
   font-size: 14px;
@@ -437,32 +381,19 @@ form.expense-form {
   padding: 25px 10px 10px;
 }
 
-#formHeading {
-  margin-bottom: 15px;
-}
+#formHeading { margin-bottom: 15px; }
+
+[hidden] { display: none !important; }
 
 @media(max-width: 650px) {
-  .summary-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .summary-card:last-child {
-    grid-column: span 2;
-  }
-
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
+  .summary-grid { grid-template-columns: 1fr 1fr; }
+  .summary-card:last-child { grid-column: span 2; }
+  .content-grid { grid-template-columns: 1fr; }
 }
 
 @media(max-width: 420px) {
-  header {
-    padding: 20px 15px;
-  }
-
-  .brand h1 {
-    font-size: 25px;
-  }
+  header { padding: 20px 15px; }
+  .brand h1 { font-size: 25px; }
 
   .language-select {
     min-width: 105px;
@@ -471,21 +402,10 @@ form.expense-form {
     font-size: 12px;
   }
 
-  main {
-    padding: 18px 13px 28px;
-  }
-
-  .summary-card {
-    padding: 14px;
-  }
-
-  .card {
-    padding: 16px;
-  }
-
-  .budget-layout {
-    gap: 15px;
-  }
+  main { padding: 18px 13px 28px; }
+  .summary-card { padding: 14px; }
+  .card { padding: 16px; }
+  .budget-layout { gap: 15px; }
 
   .budget-ring {
     width: 112px;
@@ -497,31 +417,19 @@ form.expense-form {
     height: 87px;
   }
 
-  .ring-inner strong {
-    font-size: 21px;
-  }
-
-  .budget-form {
-    flex-direction: column;
-  }
+  .ring-inner strong { font-size: 21px; }
+  .budget-form { flex-direction: column; }
 
   .month-control {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .month-control input {
-    max-width: none;
-  }
+  .month-control input { max-width: none; }
 }
 
-[dir="rtl"] .entry-right {
-  text-align: start;
-}
-
-[dir="rtl"] .entry-actions {
-  justify-content: flex-start;
-}
+[dir="rtl"] .entry-right { text-align: start; }
+[dir="rtl"] .entry-actions { justify-content: flex-start; }
 </style>
 </head>
 
@@ -533,6 +441,7 @@ form.expense-form {
       <h1>Kharcha</h1>
       <p id="tagline">Know where your money goes.</p>
     </div>
+
     <select id="language" class="language-select" aria-label="Language">
       <option value="en">English</option>
       <option value="ur">اردو</option>
@@ -608,7 +517,6 @@ form.expense-form {
 
       <form class="expense-form" id="expenseForm">
         <input id="description" type="text" maxlength="60" required placeholder="What did you spend on?">
-
         <input id="amount" type="number" min="0.01" step="0.01" required placeholder="Amount in PKR">
 
         <select id="category">
@@ -639,7 +547,13 @@ form.expense-form {
   <section class="card">
     <div class="section-heading">
       <h2 id="historyTitle">Recent transactions</h2>
-      <span class="summary-label" id="transactionCount">0 transactions</span>
+
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="summary-label" id="transactionCount">0 transactions</span>
+        <button class="danger small-btn" id="resetMonthButton" type="button" hidden>
+          Reset This Month
+        </button>
+      </div>
     </div>
 
     <div class="history-list" id="history"></div>
@@ -687,6 +601,9 @@ const translations = {
     added: "Expense added.",
     updated: "Expense updated.",
     deleted: "Expense deleted.",
+    resetMonth: "Reset This Month",
+    resetConfirm: "Are you sure? All expenses for this month will be permanently deleted. Your budget will remain unchanged.",
+    resetDone: "This month's expenses have been reset.",
     categories: {
       Food: "Food",
       Transport: "Transport",
@@ -731,6 +648,9 @@ const translations = {
     added: "خرچ شامل ہو گیا۔",
     updated: "خرچ اپ ڈیٹ ہو گیا۔",
     deleted: "خرچ حذف ہو گیا۔",
+    resetMonth: "اس مہینے کا حساب ری سیٹ کریں",
+    resetConfirm: "کیا آپ واقعی اس مہینے کے تمام اخراجات حذف کرنا چاہتے ہیں؟ آپ کا بجٹ برقرار رہے گا۔",
+    resetDone: "اس مہینے کے اخراجات ری سیٹ ہو گئے ہیں۔",
     categories: {
       Food: "کھانا",
       Transport: "سفر",
@@ -775,6 +695,9 @@ const translations = {
     added: "Kharch shamil ho gaya.",
     updated: "Kharch update ho gaya.",
     deleted: "Kharch delete ho gaya.",
+    resetMonth: "Is mahine ka hisaab reset karein",
+    resetConfirm: "Kya aap is mahine ke tamam kharch delete karna chahte hain? Aapka budget barqarar rahega.",
+    resetDone: "Is mahine ke kharch reset ho gaye hain.",
     categories: {
       Food: "Khana",
       Transport: "Safar",
@@ -908,7 +831,9 @@ function addOrUpdateExpense(event) {
   }
 
   if (editingId !== null) {
-    const index = expenses.findIndex(item => String(item.id) === String(editingId));
+    const index = expenses.findIndex(item =>
+      String(item.id) === String(editingId)
+    );
 
     if (index !== -1) {
       expenses[index] = {
@@ -955,6 +880,7 @@ function editExpense(id) {
   $("amount").value = item.amount;
   $("category").value = item.category;
   $("expenseDate").value = item.date;
+
   $("formHeading").textContent = translations[lang].edit;
   $("submitExpense").textContent = translations[lang].updateButton;
   $("cancelEdit").hidden = false;
@@ -977,6 +903,26 @@ function deleteExpense(id) {
 
   saveData();
   render();
+}
+
+/* RESET SELECTED MONTH */
+function resetCurrentMonth() {
+  const t = translations[lang];
+
+  if (!confirm(t.resetConfirm)) return;
+
+  expenses = expenses.filter(item =>
+    !(
+      typeof item.date === "string" &&
+      item.date.slice(0, 7) === selectedMonth
+    )
+  );
+
+  resetExpenseForm();
+  saveData();
+  render();
+
+  alert(t.resetDone);
 }
 
 function renderCategories(monthExpenses, total) {
@@ -1028,6 +974,9 @@ function renderHistory(monthExpenses) {
   $("transactionCount").textContent =
     `${monthExpenses.length} ${t.transactions}`;
 
+  $("resetMonthButton").textContent = t.resetMonth;
+  $("resetMonthButton").hidden = monthExpenses.length === 0;
+
   if (!monthExpenses.length) {
     $("history").innerHTML =
       `<div class="empty">${t.empty}</div>`;
@@ -1036,6 +985,7 @@ function renderHistory(monthExpenses) {
 
   $("history").innerHTML = monthExpenses.map(item => {
     const category = t.categories[item.category] || t.categories.Other;
+
     const date = new Date(item.date + "T12:00:00").toLocaleDateString(
       lang === "ur" ? "ur-PK" : "en-PK",
       { day: "numeric", month: "short", year: "numeric" }
@@ -1068,6 +1018,7 @@ function renderHistory(monthExpenses) {
 function render() {
   const t = translations[lang];
   const monthExpenses = getMonthExpenses();
+
   const total = monthExpenses.reduce(
     (sum, item) => sum + (Number(item.amount) || 0), 0
   );
@@ -1100,6 +1051,7 @@ function render() {
   $("budgetSummary").textContent = money(budget);
   $("spentSummary").textContent = money(total);
   $("remainingSummary").textContent = money(remaining);
+
   $("remainingSummary").className =
     "summary-value " + (remaining < 0 ? "red-text" : "green-text");
 
@@ -1143,6 +1095,7 @@ function render() {
 
 $("language").addEventListener("change", setLanguage);
 $("saveBudgetButton").addEventListener("click", saveBudget);
+$("resetMonthButton").addEventListener("click", resetCurrentMonth);
 $("expenseForm").addEventListener("submit", addOrUpdateExpense);
 $("cancelEdit").addEventListener("click", resetExpenseForm);
 
