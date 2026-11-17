@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10251d">
+<title>Kharcha - Expense Tracker</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6f4;color:#18251e;font-family:Arial,sans-serif}
+header{background:#10251d;color:white;padding:24px 18px}
+header h1{margin:0;font-size:28px}
+header p{margin:6px 0 0;color:#c5d5ca;font-size:14px}
+main{max-width:560px;margin:auto;padding:18px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+select,input,button{font:inherit}
+select,input{padding:12px;border:1px solid #d9e0da;border-radius:9px;background:white;width:100%;min-width:0}
+.card{background:white;padding:17px;border-radius:14px;margin-bottom:15px;box-shadow:0 2px 9px #14251b0b}
+.label{font-size:13px;color:#68766d}
+.amount{font-size:27px;font-weight:bold;margin-top:7px}
+.green{color:#16834c}
+.progress{height:9px;background:#e8eee9;border-radius:10px;margin-top:12px;overflow:hidden}
+#progressBar{height:100%;width:0;background:#16834c}
+h3{font-size:16px;margin:0 0 14px}
+form{display:grid;gap:10px}
+button{border:0;border-radius:9px;padding:13px;background:#176c43;color:white;font-weight:bold;cursor:pointer}
+button:active{opacity:.8}
+.entry{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #edf0ed;gap:10px}
+.entry:last-child{border:0}
+.entry small{display:block;color:#718077;margin-top:5px}
+.delete{background:#fcebea;color:#b43b35;padding:8px 11px}
+.empty{color:#7a867e;text-align:center;padding:15px}
+.footer{text-align:center;color:#8a958d;font-size:12px;padding:15px}
+</style>
+</head>
+<body>
+<header>
+<h1>Kharcha</h1>
+<p id="tagline">Know where your money goes.</p>
+</header>
+
+<main>
+<div class="top">
+<strong id="welcome">Your money overview</strong>
+<select id="language" style="width:145px" onchange="changeLanguage()">
+<option value="en">English</option>
+<option value="ur">اردو</option>
+<option value="roman">Roman Urdu</option>
+</select>
+</div>
+
+<div class="card">
+<div class="label" id="budgetLabel">Monthly budget (PKR)</div>
+<input id="budget" type="number" min="0" placeholder="Enter your monthly budget">
+<button style="width:100%;margin-top:9px" onclick="saveBudget()" id="budgetButton">Save budget</button>
+</div>
+
+<div class="card">
+<div class="label" id="spentLabel">Total spent</div>
+<div class="amount" id="spent">Rs. 0</div>
+<div class="label" id="remainingLabel" style="margin-top:14px">Remaining budget</div>
+<div class="amount green" id="remaining">Rs. 0</div>
+<div class="progress"><div id="progressBar"></div></div>
+</div>
+
+<div class="card">
+<h3 id="addTitle">Add an expense</h3>
+<form id="expenseForm">
+<input id="description" required maxlength="60" placeholder="What did you spend on?">
+<input id="amount" type="number" min="1" step="0.01" required placeholder="Amount in PKR">
+<select id="category">
+<option value="Food">Food</option>
+<option value="Transport">Transport</option>
+<option value="Groceries">Groceries</option>
+<option value="Bills">Bills</option>
+<option value="Shopping">Shopping</option>
+<option value="Other">Other</option>
+</select>
+<button type="submit" id="addButton">Add expense</button>
+</form>
+</div>
+
+<div class="card">
+<h3 id="historyTitle">Expense history</h3>
+<div id="history"><div class="empty">No expenses yet.</div></div>
+</div>
+
+<div class="footer">Kharcha · Simple money management</div>
+</main>
+
+<script>
+const translations = {
+en:{
+tag:"Know where your money goes.",welcome:"Your money overview",
+budget:"Monthly budget (PKR)",save:"Save budget",spent:"Total spent",
+remaining:"Remaining budget",add:"Add an expense",description:"What did you spend on?",
+amount:"Amount in PKR",addButton:"Add expense",history:"Expense history",
+empty:"No expenses yet.",delete:"Delete",
+categories:["Food","Transport","Groceries","Bills","Shopping","Other"],
+names:["Food","Transport","Groceries","Bills","Shopping","Other"]
+},
+ur:{
+tag:"اپنے پیسوں کا حساب رکھیں۔",welcome:"آپ کے پیسوں کا حساب",
+budget:"ماہانہ بجٹ (روپے)",save:"بجٹ محفوظ کریں",spent:"کل خرچ",
+remaining:"باقی بجٹ",add:"نیا خرچ شامل کریں",description:"کس چیز پر خرچ کیا؟",
+amount:"رقم روپے میں",addButton:"خرچ شامل کریں",history:"خرچ کی تفصیل",
+empty:"ابھی کوئی خرچ درج نہیں۔",delete:"حذف کریں",
+categories:["کھانا","سفر","راشن","بلز","خریداری","دیگر"],
+names:["Food","Transport","Groceries","Bills","Shopping","Other"]
+},
+roman:{
+tag:"Apne paison ka hisaab rakhein.",welcome:"Aapke paison ka hisaab",
+budget:"Mahine ka budget (PKR)",save:"Budget save karein",spent:"Kul kharch",
+remaining:"Baqi budget",add:"Naya kharch shamil karein",description:"Kis cheez par kharch kiya?",
+amount:"Raqam PKR mein",addButton:"Kharch shamil karein",history:"Kharch ki tafseel",
+empty:"Abhi koi kharch darj nahi.",delete:"Delete",
+categories:["Khana","Safar","Rashan","Bills","Shopping","Dusra"],
+names:["Food","Transport","Groceries","Bills","Shopping","Other"]
+}
+};
+
+let expenses = JSON.parse(localStorage.getItem("kharcha_expenses") || "[]");
+let budget = Number(localStorage.getItem("kharcha_budget") || 0);
+let lang = localStorage.getItem("kharcha_language") || "en";
+
+const $ = id => document.getElementById(id);
+const money = n => "Rs. " + Number(n).toLocaleString("en-PK");
+
+function saveData(){
+localStorage.setItem("kharcha_expenses",JSON.stringify(expenses));
+localStorage.setItem("kharcha_budget",budget);
+}
+
+function saveBudget(){
+budget = Math.max(0,Number($("budget").value)||0);
+saveData();
+render();
+}
+
+function addExpense(e){
+e.preventDefault();
+const description=$("description").value.trim();
+const amount=Number($("amount").value);
+if(!description || !Number.isFinite(amount) || amount<=0)return;
+expenses.unshift({
+id:Date.now()+Math.random(),
+description,
+amount,
+category:$("category").value,
+date:new Date().toISOString()
+});
+saveData();
+$("expenseForm").reset();
+render();
+}
+
+function deleteExpense(id){
+expenses=expenses.filter(x=>x.id!==id);
+saveData();
+render();
+}
+
+function changeLanguage(){
+lang=$("language").value;
+localStorage.setItem("kharcha_language",lang);
+render();
+}
+
+function render(){
+const t=translations[lang];
+document.documentElement.lang=lang==="ur"?"ur":"en";
+document.documentElement.dir=lang==="ur"?"rtl":"ltr";
+$("language").value=lang;
+$("tagline").textContent=t.tag;
+$("welcome").textContent=t.welcome;
+$("budgetLabel").textContent=t.budget;
+$("budgetButton").textContent=t.save;
+$("spentLabel").textContent=t.spent;
+$("remainingLabel").textContent=t.remaining;
+$("addTitle").textContent=t.add;
+$("description").placeholder=t.description;
+$("amount").placeholder=t.amount;
+$("addButton").textContent=t.addButton;
+$("historyTitle").textContent=t.history;
+$("budget").value=budget||"";
+
+const total=expenses.reduce((sum,x)=>sum+x.amount,0);
+$("spent").textContent=money(total);
+$("remaining").textContent=money(budget-total);
+$("remaining").style.color=budget-total<0?"#c43d35":"#16834c";
+$("progressBar").style.width=budget>0?Math.min(100,total/budget*100)+"%":"0%";
+
+$("category").innerHTML=t.names.map((name,i)=>
+`<option value="${name}">${t.categories[i]}</option>`).join("");
+
+if(!expenses.length){
+$("history").innerHTML=`<div class="empty">${t.empty}</div>`;
+return;
+}
+
+$("history").innerHTML=expenses.map(x=>{
+const categoryIndex=t.names.indexOf(x.category);
+const category=t.categories[categoryIndex]||x.category;
+const date=new Date(x.date).toLocaleDateString();
+return `<div class="entry">
+<div style="min-width:0;overflow-wrap:anywhere">
+<strong>${escapeHTML(x.description)}</strong>
+<small>${category} · ${date}</small>
+</div>
+<div style="text-align:end;white-space:nowrap">
+<strong>${money(x.amount)}</strong><br>
+<button class="delete" onclick="deleteExpense(${x.id})">${t.delete}</button>
+</div>
+</div>`;
+}).join("");
+}
+
+function escapeHTML(value){
+return String(value).replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",
+'"':"&quot;","'":"&#39;"
+})[c]);
+}
+
+$("expenseForm").addEventListener("submit",addExpense);
+render();
+</script>
+</body>
+</html>
