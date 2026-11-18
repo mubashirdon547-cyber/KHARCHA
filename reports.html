@@ -10,6 +10,26 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* Reports page layout fix */
+    .app-layout {
+      display: flex;
+      align-items: stretch;
+      min-height: 100vh;
+    }
+
+    .app-layout > .main-content {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      align-self: stretch;
+      margin-top: 0;
+      padding-top: 30px;
+    }
+
+    .main-content > .topbar {
+      margin-top: 0;
+    }
+
     .report-toolbar {
       display: flex;
       align-items: center;
@@ -155,6 +175,10 @@
       .report-card {
         padding: 17px;
       }
+
+      .app-layout > .main-content {
+        padding: 20px 16px;
+      }
     }
 
     @media print {
@@ -165,9 +189,9 @@
         display: none !important;
       }
 
-     .app-layout {
-  display: block;
-}
+      .app-layout {
+        display: block;
+      }
 
       .main-content {
         width: 100%;
@@ -199,7 +223,7 @@
       <span class="brand-name">Kharcha</span>
     </div>
 
-  <div class="nav-section">
+    <div class="nav-section">
       <p class="nav-label" data-i18n="workspace">WORKSPACE</p>
 
       <a href="index.html" class="nav-link">
@@ -228,8 +252,8 @@
       </a>
     </div>
 
-    <div class="sidebar-section">
-      <p class="sidebar-label" data-i18n="preferences">PREFERENCES</p>
+    <div class="nav-section">
+      <p class="nav-label" data-i18n="preferences">PREFERENCES</p>
 
       <a href="settings.html" class="nav-link">
         <span>⚙</span>
