@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Kharcha wallet K logo</title>
+  <desc id="desc">A glossy blue wallet with a large centered white K, green banknotes, cyan stitching and a gold clasp. No wordmark.</desc>
+  <defs>
+    <linearGradient id="wallet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#36d9ff"/><stop offset=".35" stop-color="#087cff"/><stop offset=".72" stop-color="#073bdc"/><stop offset="1" stop-color="#001b9a"/></linearGradient>
+    <linearGradient id="walletTop" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#087dff"/><stop offset="1" stop-color="#0029b9"/></linearGradient>
+    <linearGradient id="bill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c5ffb1"/><stop offset=".5" stop-color="#38e99c"/><stop offset="1" stop-color="#00a77d"/></linearGradient>
+    <linearGradient id="clasp" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5cf0ff"/><stop offset=".45" stop-color="#087fff"/><stop offset="1" stop-color="#0038cb"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff9a6"/><stop offset=".55" stop-color="#ffd84a"/><stop offset="1" stop-color="#ff9f16"/></linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%"><feGaussianBlur in="SourceAlpha" stdDeviation="14"/><feOffset dy="15"/><feComponentTransfer><feFuncA type="linear" slope=".48"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="letterShadow" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dy="5"/><feComponentTransfer><feFuncA type="linear" slope=".35"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <!-- cash notes -->
+  <g filter="url(#shadow)">
+    <path d="M290 320 L330 155 Q337 130 365 140 L735 225 Q760 231 752 260 L718 405 Z" fill="url(#bill)" stroke="#caffbd" stroke-width="13" stroke-linejoin="round"/>
+    <path d="M390 330 L420 190 Q426 166 451 173 L810 255 Q835 261 827 287 L798 416 Z" fill="url(#bill)" stroke="#caffbd" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M465 206 Q530 250 605 222 Q631 284 700 277 L685 365 L440 308 Z" fill="#009b70" opacity=".72"/>
+    <circle cx="615" cy="285" r="58" fill="#007f68" opacity=".65"/>
+  </g>
+  <!-- wallet body -->
+  <g filter="url(#shadow)">
+    <rect x="105" y="310" width="814" height="585" rx="82" fill="url(#wallet)" stroke="#0649d9" stroke-width="9"/>
+    <path d="M125 390 Q125 330 190 330 H840 Q900 330 900 390" fill="none" stroke="#a8f7ff" stroke-width="13" stroke-linecap="round" opacity=".95"/>
+    <rect x="148" y="385" width="728" height="455" rx="54" fill="none" stroke="#62dcff" stroke-width="9" stroke-dasharray="22 22" stroke-linecap="round" opacity=".9"/>
+    <!-- K is deliberately centered on the wallet face -->
+    <text x="512" y="725" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="430" font-weight="900" letter-spacing="-22" fill="#ffffff" stroke="#eef5ff" stroke-width="3" paint-order="stroke" filter="url(#letterShadow)">K</text>
+  </g>
+  <!-- right-hand clasp, kept clear of the K -->
+  <g filter="url(#shadow)">
+    <path d="M720 575 Q720 535 765 525 L930 500 Q965 495 965 530 L965 680 Q965 710 935 715 L765 730 Q720 733 720 690 Z" fill="#00145f"/>
+    <path d="M735 580 Q735 548 770 540 L932 515 Q950 512 950 535 L950 674 Q950 694 930 697 L770 711 Q735 713 735 682 Z" fill="url(#clasp)" stroke="#53eaff" stroke-width="9"/>
+    <circle cx="835" cy="615" r="52" fill="#00135e"/>
+    <circle cx="835" cy="615" r="38" fill="url(#gold)" stroke="#fff2a1" stroke-width="5"/>
+  </g>
+  <!-- small shine marks -->
+  <g fill="none" stroke="#39dfff" stroke-width="24" stroke-linecap="round"><path d="M190 235 L150 205"/><path d="M265 190 L250 145"/></g>
+</svg>
