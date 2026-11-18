@@ -7,35 +7,271 @@
   <meta name="theme-color" content="#080d18">
   <meta name="description" content="Kharcha Reports - Review your monthly spending and budget performance.">
   <title>Reports | Kharcha</title>
-
   <link rel="stylesheet" href="style.css">
 
-  <!-- PDF generation library -->
+  <!-- Free PDF generation library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    .app-layout {
+      display: flex;
+      align-items: stretch;
+      min-height: 100vh;
+    }
+
+    .app-layout > .main-content {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      align-self: stretch;
+      margin-top: 0;
+      padding-top: 30px;
+    }
+
+    .main-content > .topbar {
+      margin-top: 0;
+    }
+
+    .report-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .report-month {
+      padding: 11px 13px;
+      border: 1px solid var(--border-color, #263247);
+      border-radius: 10px;
+      background: var(--card-bg, #111a2b);
+      color: inherit;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin-top: 22px;
+    }
+
+    .report-card {
+      background: var(--card-bg, #111a2b);
+      border: 1px solid var(--border-color, #263247);
+      border-radius: 16px;
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .report-card h3 {
+      margin: 0 0 8px;
+    }
+
+    .report-muted {
+      color: var(--muted-text, #94a3b8);
+      font-size: 13px;
+    }
+
+    .report-value {
+      font-size: 27px;
+      font-weight: 700;
+      margin: 12px 0 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .report-progress {
+      height: 12px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(148,163,184,.15);
+      margin: 17px 0 10px;
+    }
+
+    .report-progress-fill {
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #2563eb, #38bdf8);
+    }
+
+    .report-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 18px;
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+      font-size: 14px;
+    }
+
+    .report-table th,
+    .report-table td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--border-color, #263247);
+      text-align: left;
+    }
+
+    .report-table th {
+      color: var(--muted-text, #94a3b8);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .report-empty {
+      padding: 24px 0;
+      color: var(--muted-text, #94a3b8);
+      font-size: 14px;
+    }
+
+    .report-category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 18px;
+    }
+
+    .report-category-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .report-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .report-action {
+      padding: 10px 15px;
+      border: 1px solid var(--border-color, #263247);
+      border-radius: 10px;
+      background: var(--card-bg, #111a2b);
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .report-action:hover {
+      border-color: #38bdf8;
+    }
+
+    .report-action:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .report-pdf-button {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+
+    .report-wide {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 760px) {
+      .report-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .report-wide {
+        grid-column: auto;
+      }
+
+      .report-card {
+        padding: 17px;
+      }
+
+      .app-layout > .main-content {
+        padding: 20px 16px;
+      }
+    }
+
+    @media print {
+      .sidebar,
+      .topbar select,
+      .report-toolbar,
+      .report-actions {
+        display: none !important;
+      }
+
+      .app-layout {
+        display: block;
+      }
+
+      .main-content {
+        width: 100%;
+        margin: 0;
+      }
+
+      .report-card,
+      .stat-card {
+        break-inside: avoid;
+        border: 1px solid #ddd;
+        color: #111;
+        background: white;
+      }
+
+      body {
+        background: white !important;
+        color: #111 !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
-
 <div class="app-layout">
 
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-icon">K</div>
+      <div class="brand-logo">K</div>
       <span class="brand-name">Kharcha</span>
     </div>
 
     <div class="nav-section">
-      <span class="nav-label" data-i18n="workspace">WORKSPACE</span>
-      <a href="index.html" class="nav-item"><span>▦</span><span data-i18n="dashboard">Dashboard</span></a>
-      <a href="expenses.html" class="nav-item"><span>↗</span><span data-i18n="expenses">Expenses</span></a>
-      <a href="budgets.html" class="nav-item"><span>◫</span><span data-i18n="budgets">Budgets</span></a>
-      <a href="analytics.html" class="nav-item"><span>⌁</span><span data-i18n="analytics">Analytics</span></a>
-      <a href="reports.html" class="nav-item active"><span>▤</span><span data-i18n="reports">Reports</span></a>
+      <p class="nav-label" data-i18n="workspace">WORKSPACE</p>
+
+      <a href="index.html" class="nav-link">
+        <span>⌂</span>
+        <span data-i18n="dashboard">Dashboard</span>
+      </a>
+
+      <a href="expenses.html" class="nav-link">
+        <span>↗</span>
+        <span data-i18n="expenses">Expenses</span>
+      </a>
+
+      <a href="budgets.html" class="nav-link">
+        <span>◫</span>
+        <span data-i18n="budgets">Budgets</span>
+      </a>
+
+      <a href="analytics.html" class="nav-link">
+        <span>▥</span>
+        <span data-i18n="analytics">Analytics</span>
+      </a>
+
+      <a href="reports.html" class="nav-link active">
+        <span>▤</span>
+        <span data-i18n="reports">Reports</span>
+      </a>
     </div>
 
     <div class="nav-section">
-      <span class="nav-label" data-i18n="preferences">PREFERENCES</span>
-      <a href="settings.html" class="nav-item"><span>⚙</span><span data-i18n="settings">Settings</span></a>
+      <p class="nav-label" data-i18n="preferences">PREFERENCES</p>
+
+      <a href="settings.html" class="nav-link">
+        <span>⚙</span>
+        <span data-i18n="settings">Settings</span>
+      </a>
     </div>
   </aside>
 
@@ -43,11 +279,13 @@
 
     <header class="topbar">
       <div>
-        <h2 data-i18n="reports">Reports</h2>
-        <p data-i18n="reportsSubtitle">Your financial activity, organized into reports.</p>
+        <h1 data-i18n="reports">Reports</h1>
+        <p data-i18n="reportsSubtitle">
+          A clear picture of your financial activity.
+        </p>
       </div>
 
-      <select id="languageSelect" class="language-select">
+      <select id="languageSelect" class="report-month" aria-label="Language">
         <option value="en">English</option>
         <option value="ur">اردو</option>
         <option value="roman">Roman Urdu</option>
@@ -56,100 +294,141 @@
 
     <section class="page-content">
 
-      <div class="page-heading">
+      <div class="report-toolbar">
         <div>
-          <h1 data-i18n="monthlyReport">Monthly Report</h1>
-          <p data-i18n="monthlyReportDescription">Review your spending and budget performance.</p>
+          <h2 data-i18n="monthlyReport">Monthly Report</h2>
+          <p class="report-muted" data-i18n="monthlyReportDescription">
+            Review your expense and budget activity.
+          </p>
         </div>
 
-        <div class="report-actions">
-          <button class="btn-secondary" onclick="downloadCSV()">Download CSV</button>
-          <button class="btn-primary" id="pdfButton" onclick="downloadPDF()">Download PDF</button>
-        </div>
-      </div>
-
-      <div class="card report-filter">
-        <label for="monthPicker" data-i18n="selectMonth">Select Month</label>
-        <input type="month" id="monthPicker">
+        <input type="month" id="reportMonth" class="report-month">
       </div>
 
       <div class="stats-grid">
-        <div class="stat-card">
-          <p data-i18n="totalSpent">Total Spent</p>
-          <h2 id="totalSpent">Rs. 0</h2>
-        </div>
 
         <div class="stat-card">
-          <p data-i18n="monthlyBudget">Monthly Budget</p>
-          <h2 id="monthlyBudget">Rs. 0</h2>
-        </div>
-
-        <div class="stat-card">
-          <p data-i18n="remaining">Remaining</p>
-          <h2 id="remaining">Rs. 0</h2>
+          <p data-i18n="reportTotalSpent">Total Spent</p>
+          <h2 id="reportSpent" class="report-value">0</h2>
+          <p class="report-muted" data-i18n="monthlyExpenses">
+            Expenses recorded for this month
+          </p>
         </div>
 
         <div class="stat-card">
-          <p data-i18n="transactions">Transactions</p>
-          <h2 id="transactionCount">0</h2>
-        </div>
-      </div>
-
-      <div class="content-grid">
-
-        <div class="card">
-          <div class="card-header">
-            <h3 data-i18n="categoryBreakdown">Category Breakdown</h3>
-          </div>
-          <div id="categoryBreakdown" class="report-category-list">
-            <p>No spending data available.</p>
-          </div>
+          <p data-i18n="reportBudget">Monthly Budget</p>
+          <h2 id="reportBudget" class="report-value">0</h2>
+          <p class="report-muted" data-i18n="assignedBudget">
+            Your assigned spending limit
+          </p>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <h3 data-i18n="budgetPerformance">Budget Performance</h3>
-          </div>
-          <div id="budgetPerformance">
-            <p>No budget information available.</p>
-          </div>
+        <div class="stat-card">
+          <p data-i18n="reportRemaining">Remaining</p>
+          <h2 id="reportRemaining" class="report-value">0</h2>
+          <p class="report-muted" data-i18n="budgetAfterExpenses">
+            Budget remaining after expenses
+          </p>
+        </div>
+
+        <div class="stat-card">
+          <p data-i18n="reportTransactions">Transactions</p>
+          <h2 id="reportTransactions" class="report-value">0</h2>
+          <p class="report-muted" data-i18n="totalRecorded">
+            Total recorded transactions
+          </p>
         </div>
 
       </div>
 
-      <div class="card report-table-card">
-        <div class="card-header">
-          <h3 data-i18n="transactionHistory">Transaction History</h3>
-          <span id="reportMonthLabel"></span>
+      <div class="report-grid">
+
+        <div class="report-card">
+          <h3 data-i18n="budgetPerformance">Budget Performance</h3>
+          <p class="report-muted" data-i18n="budgetPerformanceDescription">
+            How much of your monthly budget has been used.
+          </p>
+
+          <h2 id="budgetPercentage" class="report-value">0%</h2>
+
+          <div class="report-progress">
+            <div id="budgetProgress" class="report-progress-fill"
+              style="width:0%"></div>
+          </div>
+
+          <p id="budgetStatus" class="report-muted">—</p>
         </div>
 
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th data-i18n="description">Description</th>
-                <th data-i18n="category">Category</th>
-                <th data-i18n="date">Date</th>
-                <th data-i18n="amount">Amount</th>
-              </tr>
-            </thead>
-            <tbody id="transactionTable">
-              <tr><td colspan="4">No transactions found.</td></tr>
-            </tbody>
-          </table>
+        <div class="report-card">
+          <h3 data-i18n="categorySummary">Category Summary</h3>
+          <p class="report-muted" data-i18n="categorySummaryDescription">
+            Spending grouped by category.
+          </p>
+
+          <div id="categorySummary" class="report-category-list">
+            <p class="report-empty">Loading...</p>
+          </div>
         </div>
+
+        <div class="report-card report-wide">
+          <h3 data-i18n="expenseDetails">Expense Details</h3>
+          <p class="report-muted" data-i18n="expenseDetailsDescription">
+            A complete list of expenses for the selected month.
+          </p>
+
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th data-i18n="date">Date</th>
+                  <th data-i18n="description">Description</th>
+                  <th data-i18n="category">Category</th>
+                  <th data-i18n="amount">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody id="expenseReportBody">
+                <tr>
+                  <td colspan="4" class="report-empty"
+                    data-i18n="noReportExpenses">
+                    No expenses found for this month.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="report-actions">
+            <button type="button" class="report-action"
+              id="printReport" data-i18n="printReport">
+              Print Report
+            </button>
+
+            <button type="button" class="report-action"
+              id="downloadCSV" data-i18n="downloadCSV">
+              Download CSV
+            </button>
+
+            <button type="button"
+              class="report-action report-pdf-button"
+              id="downloadPDF">
+              Download PDF
+            </button>
+          </div>
+        </div>
+
       </div>
 
     </section>
   </main>
 </div>
 
-<!-- This section is used to create the PDF -->
+<!-- Hidden, professionally formatted PDF report -->
 <div id="pdfReport" style="
-  position:absolute;
+  position:fixed;
   left:-10000px;
   top:0;
-  width:750px;
+  width:760px;
   padding:35px;
   background:#ffffff;
   color:#172033;
@@ -158,19 +437,17 @@
 ">
 
   <div style="border-bottom:3px solid #2563eb;padding-bottom:18px;margin-bottom:25px;">
-    <div style="font-size:28px;font-weight:800;color:#14213d;">KHARCHA</div>
-    <div style="font-size:13px;color:#64748b;margin-top:5px;">Personal Finance Report</div>
+    <div style="font-size:29px;font-weight:800;color:#14213d;">KHARCHA</div>
+    <div style="font-size:12px;color:#64748b;margin-top:5px;">PERSONAL FINANCE REPORT</div>
     <div id="pdfMonth" style="font-size:17px;font-weight:700;margin-top:20px;"></div>
   </div>
 
   <h2 style="font-size:18px;color:#14213d;">Financial Summary</h2>
 
-  <div id="pdfSummary" style="
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-bottom:25px;
-  "></div>
+  <div id="pdfSummary" style="margin-bottom:25px;"></div>
+
+  <h2 style="font-size:18px;color:#14213d;margin-top:25px;">Budget Performance</h2>
+  <div id="pdfBudget" style="margin-bottom:25px;"></div>
 
   <h2 style="font-size:18px;color:#14213d;margin-top:25px;">Category Breakdown</h2>
   <div id="pdfCategories" style="margin-bottom:25px;"></div>
@@ -180,9 +457,9 @@
   <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:12px;">
     <thead>
       <tr style="background:#eff4ff;">
+        <th style="padding:10px;text-align:left;border:1px solid #dbe3ef;">Date</th>
         <th style="padding:10px;text-align:left;border:1px solid #dbe3ef;">Description</th>
         <th style="padding:10px;text-align:left;border:1px solid #dbe3ef;">Category</th>
-        <th style="padding:10px;text-align:left;border:1px solid #dbe3ef;">Date</th>
         <th style="padding:10px;text-align:right;border:1px solid #dbe3ef;">Amount</th>
       </tr>
     </thead>
@@ -204,171 +481,193 @@
 <script src="app.js"></script>
 
 <script>
-(function () {
-  const K = window.Kharcha;
-
-  if (!K) {
-    alert("Kharcha could not load. Please refresh the page.");
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.Kharcha) {
+    console.error("Kharcha app.js could not be loaded.");
     return;
   }
 
-  const monthPicker = document.getElementById("monthPicker");
+  const K = window.Kharcha;
+  const monthInput = document.getElementById("reportMonth");
   const languageSelect = document.getElementById("languageSelect");
 
+  monthInput.value = K.getCurrentMonth();
+  languageSelect.value = K.getLanguage();
+
+  languageSelect.addEventListener("change", () => {
+    K.setLanguage(languageSelect.value);
+    renderReport();
+  });
+
+  monthInput.addEventListener("change", renderReport);
+
+  document.getElementById("printReport").addEventListener("click", () => {
+    window.print();
+  });
+
   function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, function (char) {
-      return {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-      }[char];
-    });
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
   }
 
-  function money(amount) {
-    return K.formatCurrency(Number(amount) || 0);
+  function money(value) {
+    return K.formatCurrency(Number(value) || 0);
   }
 
-  function getMonth() {
-    return monthPicker.value || K.getCurrentMonth();
+  function getExpenses(month) {
+    return K.getExpenses()
+      .filter(expense =>
+        String(expense.date || "").slice(0, 7) === month
+      )
+      .sort((a, b) => String(b.date).localeCompare(String(a.date)));
   }
 
-  function getMonthData() {
-    const month = getMonth();
+  function getCategoryName(category) {
+    try {
+      return K.translate(category) || category;
+    } catch (error) {
+      return category;
+    }
+  }
 
-    const expenses = K.getExpenses().filter(function (expense) {
-      return String(expense.date || "").slice(0, 7) === month;
-    });
+  function getReportData() {
+    const month = monthInput.value || K.getCurrentMonth();
+    const expenses = getExpenses(month);
+    const summary = K.getMonthlySummary(month) || {};
 
-    const total = expenses.reduce(function (sum, expense) {
-      return sum + Number(expense.amount || 0);
-    }, 0);
+    const spent = expenses.reduce(
+      (sum, expense) => sum + Number(expense.amount || 0), 0
+    );
 
-    const budget = Number(K.getMonthlyBudget(month)) || 0;
-    const remaining = budget - total;
+    const budget = Number(summary.budget || 0);
+    const remaining = budget - spent;
+    const percentage = budget > 0 ? (spent / budget) * 100 : 0;
 
     const categories = {};
 
-    expenses.forEach(function (expense) {
+    expenses.forEach(expense => {
       const category = expense.category || "other";
-      categories[category] = (categories[category] || 0) + Number(expense.amount || 0);
+      categories[category] = (categories[category] || 0) +
+        Number(expense.amount || 0);
     });
 
     return {
       month,
       expenses,
-      total,
+      spent,
       budget,
       remaining,
+      percentage,
       categories
     };
   }
 
   function renderReport() {
-    const data = getMonthData();
+    const data = getReportData();
 
-    document.getElementById("totalSpent").textContent = money(data.total);
-    document.getElementById("monthlyBudget").textContent = money(data.budget);
-    document.getElementById("remaining").textContent = money(data.remaining);
-    document.getElementById("transactionCount").textContent = data.expenses.length;
+    document.getElementById("reportSpent").textContent = money(data.spent);
+    document.getElementById("reportBudget").textContent = money(data.budget);
+    document.getElementById("reportRemaining").textContent = money(data.remaining);
+    document.getElementById("reportTransactions").textContent = data.expenses.length;
 
-    document.getElementById("reportMonthLabel").textContent = data.month;
+    document.getElementById("budgetPercentage").textContent =
+      data.budget > 0 ? data.percentage.toFixed(1) + "%" : "—";
 
-    const categoryContainer = document.getElementById("categoryBreakdown");
+    document.getElementById("budgetProgress").style.width =
+      Math.min(data.percentage, 100) + "%";
 
-    const categoryEntries = Object.entries(data.categories)
-      .sort(function (a, b) {
-        return b[1] - a[1];
-      });
+    let status = K.translate("reportNoBudget");
 
-    if (!categoryEntries.length) {
-      categoryContainer.innerHTML = "<p>No spending data available.</p>";
-    } else {
-      categoryContainer.innerHTML = categoryEntries.map(function (entry) {
-        const percentage = data.total > 0
-          ? (entry[1] / data.total) * 100
-          : 0;
-
-        return `
-          <div style="margin-bottom:18px;">
-            <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;">
-              <strong>${escapeHTML(K.translate(entry[0]) || entry[0])}</strong>
-              <span>${money(entry[1])}</span>
-            </div>
-            <div style="height:8px;background:#e8edf5;border-radius:20px;overflow:hidden;">
-              <div style="height:100%;width:${percentage}%;background:#3978ed;border-radius:20px;"></div>
-            </div>
-            <small>${percentage.toFixed(1)}%</small>
-          </div>
-        `;
-      }).join("");
+    if (data.budget > 0) {
+      if (data.percentage > 100) {
+        status = K.translate("reportOverBudget");
+      } else if (data.percentage >= 80) {
+        status = K.translate("reportNearLimit");
+      } else {
+        status = K.translate("reportWithinBudget");
+      }
     }
 
-    const performance = document.getElementById("budgetPerformance");
-    const percent = data.budget > 0
-      ? (data.total / data.budget) * 100
-      : 0;
+    document.getElementById("budgetStatus").textContent = status;
 
-    if (data.budget <= 0) {
-      performance.innerHTML = "<p>No budget has been set for this month.</p>";
-    } else {
-      performance.innerHTML = `
-        <h2 style="font-size:28px;margin:12px 0;">${percent.toFixed(1)}%</h2>
-        <p>${percent > 100 ? "You exceeded your budget." : "Your budget usage so far."}</p>
-        <div style="height:10px;background:#e8edf5;border-radius:20px;overflow:hidden;margin:15px 0;">
-          <div style="height:100%;width:${Math.min(percent, 100)}%;background:${percent > 100 ? "#dc5555" : "#3978ed"};"></div>
-        </div>
-        <p>Spent: <strong>${money(data.total)}</strong></p>
-        <p>Budget: <strong>${money(data.budget)}</strong></p>
-        <p>Remaining: <strong>${money(data.remaining)}</strong></p>
-      `;
-    }
-
-    const table = document.getElementById("transactionTable");
-
-    if (!data.expenses.length) {
-      table.innerHTML = '<tr><td colspan="4">No transactions found.</td></tr>';
-    } else {
-      table.innerHTML = data.expenses
-        .slice()
-        .sort(function (a, b) {
-          return String(b.date).localeCompare(String(a.date));
-        })
-        .map(function (expense) {
-          return `
-            <tr>
-              <td>${escapeHTML(expense.description)}</td>
-              <td>${escapeHTML(K.translate(expense.category) || expense.category)}</td>
-              <td>${escapeHTML(expense.date)}</td>
-              <td>${money(expense.amount)}</td>
-            </tr>
-          `;
-        }).join("");
-    }
+    renderCategories(data);
+    renderExpenseTable(data.expenses);
   }
 
-  window.downloadCSV = function () {
-    const data = getMonthData();
+  function renderCategories(data) {
+    const container = document.getElementById("categorySummary");
+
+    const entries = Object.entries(data.categories)
+      .sort((a, b) => b[1] - a[1]);
+
+    if (!entries.length) {
+      container.innerHTML = `
+        <p class="report-empty">
+          ${escapeHTML(K.translate("noCategoryData"))}
+        </p>`;
+      return;
+    }
+
+    container.innerHTML = entries.map(([category, amount]) => {
+      const percentage = data.spent > 0
+        ? (amount / data.spent) * 100
+        : 0;
+
+      return `
+        <div class="report-category-row">
+          <span>${escapeHTML(getCategoryName(category))}</span>
+          <strong>${money(amount)} (${percentage.toFixed(1)}%)</strong>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderExpenseTable(expenses) {
+    const body = document.getElementById("expenseReportBody");
+
+    if (!expenses.length) {
+      body.innerHTML = `
+        <tr>
+          <td colspan="4" class="report-empty">
+            ${escapeHTML(K.translate("noReportExpenses"))}
+          </td>
+        </tr>`;
+      return;
+    }
+
+    body.innerHTML = expenses.map(expense => `
+      <tr>
+        <td>${escapeHTML(expense.date || "—")}</td>
+        <td>${escapeHTML(expense.description || "—")}</td>
+        <td>${escapeHTML(getCategoryName(expense.category || "other"))}</td>
+        <td><strong>${money(expense.amount)}</strong></td>
+      </tr>
+    `).join("");
+  }
+
+  function downloadCSV() {
+    const data = getReportData();
 
     const rows = [
-      ["Description", "Category", "Date", "Amount"],
-      ...data.expenses.map(function (expense) {
-        return [
-          expense.description || "",
-          expense.category || "",
-          expense.date || "",
-          expense.amount || 0
-        ];
-      })
+      ["Date", "Description", "Category", "Amount"],
+      ...data.expenses.map(expense => [
+        expense.date || "",
+        expense.description || "",
+        expense.category || "other",
+        Number(expense.amount || 0)
+      ])
     ];
 
-    const csv = rows.map(function (row) {
-      return row.map(function (value) {
-        return '"' + String(value).replace(/"/g, '""') + '"';
-      }).join(",");
-    }).join("\n");
+    const csv = rows.map(row =>
+      row.map(value =>
+        '"' + String(value).replace(/"/g, '""') + '"'
+      ).join(",")
+    ).join("\r\n");
 
     const blob = new Blob(["\uFEFF" + csv], {
       type: "text/csv;charset=utf-8;"
@@ -378,80 +677,122 @@
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "Kharcha-Report-" + data.month + ".csv";
+    link.download = "kharcha-report-" + data.month + ".csv";
+
+    document.body.appendChild(link);
     link.click();
+    link.remove();
 
-    URL.revokeObjectURL(url);
-  };
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
 
-  window.downloadPDF = async function () {
-    const button = document.getElementById("pdfButton");
+  function preparePDF(data) {
+    document.getElementById("pdfMonth").textContent =
+      "Monthly Report: " + data.month;
+
+    const summaryItems = [
+      ["Total Spent", money(data.spent)],
+      ["Monthly Budget", money(data.budget)],
+      ["Remaining", money(data.remaining)],
+      ["Transactions", String(data.expenses.length)]
+    ];
+
+    document.getElementById("pdfSummary").innerHTML = `
+      <table style="width:100%;border-collapse:separate;border-spacing:8px;">
+        <tr>
+          ${summaryItems.slice(0, 2).map(item => `
+            <td style="padding:15px;background:#f1f5fb;border-radius:8px;width:50%;">
+              <div style="font-size:11px;color:#64748b;">${item[0]}</div>
+              <div style="font-size:19px;font-weight:bold;margin-top:7px;">${escapeHTML(item[1])}</div>
+            </td>
+          `).join("")}
+        </tr>
+        <tr>
+          ${summaryItems.slice(2, 4).map(item => `
+            <td style="padding:15px;background:#f1f5fb;border-radius:8px;width:50%;">
+              <div style="font-size:11px;color:#64748b;">${item[0]}</div>
+              <div style="font-size:19px;font-weight:bold;margin-top:7px;">${escapeHTML(item[1])}</div>
+            </td>
+          `).join("")}
+        </tr>
+      </table>
+    `;
+
+    const status = data.budget <= 0
+      ? "No budget set"
+      : data.percentage > 100
+        ? "Over budget"
+        : data.percentage >= 80
+          ? "Near budget limit"
+          : "Within budget";
+
+    document.getElementById("pdfBudget").innerHTML = `
+      <div style="padding:16px;background:#f1f5fb;border-radius:8px;">
+        <div style="font-size:22px;font-weight:bold;color:#2563eb;">
+          ${data.budget > 0 ? data.percentage.toFixed(1) + "%" : "—"}
+        </div>
+        <div style="font-size:12px;color:#64748b;margin-top:5px;">
+          ${status}
+        </div>
+        <div style="height:9px;background:#dbe4f0;border-radius:10px;margin-top:12px;overflow:hidden;">
+          <div style="height:9px;width:${Math.min(data.percentage, 100)}%;background:#2563eb;"></div>
+        </div>
+      </div>
+    `;
+
+    const entries = Object.entries(data.categories)
+      .sort((a, b) => b[1] - a[1]);
+
+    document.getElementById("pdfCategories").innerHTML = entries.length
+      ? entries.map(([category, amount]) => {
+          const percentage = data.spent > 0
+            ? (amount / data.spent) * 100
+            : 0;
+
+          return `
+            <div style="padding:10px 0;border-bottom:1px solid #e2e8f0;">
+              <span>${escapeHTML(getCategoryName(category))}</span>
+              <strong style="float:right;">
+                ${escapeHTML(money(amount))} (${percentage.toFixed(1)}%)
+              </strong>
+            </div>
+          `;
+        }).join("")
+      : '<p style="color:#64748b;">No category spending recorded.</p>';
+
+    document.getElementById("pdfTransactions").innerHTML =
+      data.expenses.length
+        ? data.expenses.map(expense => `
+            <tr>
+              <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(expense.date || "—")}</td>
+              <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(expense.description || "—")}</td>
+              <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(getCategoryName(expense.category || "other"))}</td>
+              <td style="padding:9px;text-align:right;border:1px solid #dbe3ef;">${escapeHTML(money(expense.amount))}</td>
+            </tr>
+          `).join("")
+        : `
+            <tr>
+              <td colspan="4" style="padding:12px;border:1px solid #dbe3ef;">
+                No transactions found for this month.
+              </td>
+            </tr>
+          `;
+  }
+
+  async function downloadPDF() {
+    const button = document.getElementById("downloadPDF");
 
     if (!window.html2pdf) {
-      alert("PDF library could not load. Check your internet connection and try again.");
+      alert("PDF library could not load. Please check your internet connection and refresh the page.");
       return;
     }
-
-    const data = getMonthData();
 
     button.disabled = true;
     button.textContent = "Preparing PDF...";
 
     try {
-      document.getElementById("pdfMonth").textContent =
-        "Monthly Report: " + data.month;
-
-      document.getElementById("pdfSummary").innerHTML = [
-        ["Total Spent", money(data.total)],
-        ["Monthly Budget", money(data.budget)],
-        ["Remaining", money(data.remaining)],
-        ["Transactions", data.expenses.length]
-      ].map(function (item) {
-        return `
-          <div style="padding:15px;background:#f3f6fc;border-radius:8px;">
-            <div style="font-size:11px;color:#64748b;margin-bottom:7px;">${item[0]}</div>
-            <div style="font-size:19px;font-weight:700;color:#172033;">${item[1]}</div>
-          </div>
-        `;
-      }).join("");
-
-      const categoryEntries = Object.entries(data.categories)
-        .sort(function (a, b) {
-          return b[1] - a[1];
-        });
-
-      document.getElementById("pdfCategories").innerHTML =
-        categoryEntries.length
-          ? categoryEntries.map(function (entry) {
-              const percent = data.total > 0
-                ? (entry[1] / data.total) * 100
-                : 0;
-
-              return `
-                <div style="padding:9px 0;border-bottom:1px solid #e2e8f0;">
-                  <strong>${escapeHTML(K.translate(entry[0]) || entry[0])}</strong>
-                  <span style="float:right;">${money(entry[1])} (${percent.toFixed(1)}%)</span>
-                </div>
-              `;
-            }).join("")
-          : "<p>No category spending recorded.</p>";
-
-      const transactionBody = document.getElementById("pdfTransactions");
-
-      transactionBody.innerHTML = data.expenses.length
-        ? data.expenses.slice().sort(function (a, b) {
-            return String(b.date).localeCompare(String(a.date));
-          }).map(function (expense) {
-            return `
-              <tr>
-                <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(expense.description)}</td>
-                <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(K.translate(expense.category) || expense.category)}</td>
-                <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(expense.date)}</td>
-                <td style="padding:9px;text-align:right;border:1px solid #dbe3ef;">${money(expense.amount)}</td>
-              </tr>
-            `;
-          }).join("")
-        : '<tr><td colspan="4" style="padding:12px;border:1px solid #dbe3ef;">No transactions found for this month.</td></tr>';
+      const data = getReportData();
+      preparePDF(data);
 
       const element = document.getElementById("pdfReport");
 
@@ -479,29 +820,23 @@
       }).from(element).save();
 
     } catch (error) {
-      console.error(error);
-      alert("Could not generate the PDF. Please try again.");
+      console.error("PDF generation error:", error);
+      alert("PDF generation failed. Please refresh the page and try again.");
     } finally {
       button.disabled = false;
       button.textContent = "Download PDF";
     }
-  };
+  }
 
-  monthPicker.value = K.getCurrentMonth();
+  document.getElementById("downloadCSV")
+    .addEventListener("click", downloadCSV);
 
-  monthPicker.addEventListener("change", renderReport);
-
-  languageSelect.value = K.getLanguage();
-
-  languageSelect.addEventListener("change", function () {
-    K.setLanguage(languageSelect.value);
-    renderReport();
-  });
+  document.getElementById("downloadPDF")
+    .addEventListener("click", downloadPDF);
 
   K.applyTranslations();
   renderReport();
-
-})();
+});
 </script>
 
 </body>
