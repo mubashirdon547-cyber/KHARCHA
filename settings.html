@@ -386,10 +386,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateLanguage(settingsLanguage.value);
   });
 
-  currencySelect.addEventListener("change", () => {
-    localStorage.setItem(currencyKey, currencySelect.value);
-    showStatus("currencySaved");
-  });
+ currencySelect.addEventListener("change", () => {
+  K.setCurrency(currencySelect.value);
+  showStatus("currencySaved");
+});
 
   document.getElementById("exportDataButton")
     .addEventListener("click", () => {
