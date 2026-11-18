@@ -165,9 +165,9 @@
         display: none !important;
       }
 
-      .app-shell {
-        display: block;
-      }
+     .app-layout {
+  display: block;
+}
 
       .main-content {
         width: 100%;
