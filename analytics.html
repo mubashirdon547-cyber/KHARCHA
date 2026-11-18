@@ -1,0 +1,543 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d18">
+  <meta name="description" content="Kharcha Analytics - Understand your spending habits and financial patterns.">
+  <title>Analytics | Kharcha</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin-top: 22px;
+    }
+
+    .analytics-card {
+      background: var(--card-bg, #111a2b);
+      border: 1px solid var(--border-color, #263247);
+      border-radius: 16px;
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .analytics-card h3 {
+      margin: 0 0 7px;
+    }
+
+    .analytics-muted {
+      color: var(--muted-text, #94a3b8);
+      font-size: 13px;
+    }
+
+    .analytics-stat {
+      font-size: 27px;
+      font-weight: 700;
+      margin: 12px 0 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .trend-list, .category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 17px;
+      margin-top: 22px;
+    }
+
+    .trend-item, .category-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .trend-label, .category-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .bar-track {
+      height: 9px;
+      width: 100%;
+      background: rgba(148,163,184,.14);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #2563eb, #38bdf8);
+      transition: width .3s ease;
+    }
+
+    .category-fill {
+      background: linear-gradient(90deg, #6366f1, #38bdf8);
+    }
+
+    .insight-box {
+      border: 1px solid rgba(56,189,248,.25);
+      background: rgba(37,99,235,.08);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 14px;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .analytics-empty {
+      color: var(--muted-text, #94a3b8);
+      padding: 20px 0;
+      font-size: 14px;
+    }
+
+    .analytics-month {
+      max-width: 190px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color, #263247);
+      background: var(--card-bg, #111a2b);
+      color: inherit;
+    }
+
+    .analytics-wide {
+      grid-column: 1 / -1;
+    }
+
+    .analytics-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 760px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .analytics-wide {
+        grid-column: auto;
+      }
+
+      .analytics-card {
+        padding: 17px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">K</div>
+      <span>Kharcha</span>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="sidebar-label" data-i18n="workspace">WORKSPACE</p>
+
+      <a href="index.html" class="nav-link">
+        <span>⌂</span>
+        <span data-i18n="dashboard">Dashboard</span>
+      </a>
+
+      <a href="expenses.html" class="nav-link">
+        <span>↗</span>
+        <span data-i18n="expenses">Expenses</span>
+      </a>
+
+      <a href="budgets.html" class="nav-link">
+        <span>◫</span>
+        <span data-i18n="budgets">Budgets</span>
+      </a>
+
+      <a href="analytics.html" class="nav-link active">
+        <span>▥</span>
+        <span data-i18n="analytics">Analytics</span>
+      </a>
+
+      <a href="reports.html" class="nav-link">
+        <span>▤</span>
+        <span data-i18n="reports">Reports</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="sidebar-label" data-i18n="preferences">PREFERENCES</p>
+
+      <a href="settings.html" class="nav-link">
+        <span>⚙</span>
+        <span data-i18n="settings">Settings</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="topbar">
+      <div>
+        <h1 data-i18n="analytics">Analytics</h1>
+        <p data-i18n="analyticsSubtitle">Understand where your money goes.</p>
+      </div>
+
+      <select id="languageSelect" class="analytics-month" aria-label="Language">
+        <option value="en">English</option>
+        <option value="ur">اردو</option>
+        <option value="roman">Roman Urdu</option>
+      </select>
+    </header>
+
+    <section class="page-content">
+
+      <div class="analytics-header-row">
+        <div>
+          <h2 data-i18n="financialOverview">Financial Overview</h2>
+          <p class="analytics-muted" data-i18n="financialOverviewDescription">
+            A closer look at your monthly spending.
+          </p>
+        </div>
+
+        <input type="month" id="analyticsMonth" class="analytics-month">
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <p data-i18n="monthlySpending">Monthly Spending</p>
+          <h2 id="totalSpent" class="analytics-stat">0</h2>
+          <p class="analytics-muted" data-i18n="totalExpensesThisMonth">
+            Total expenses this month
+          </p>
+        </div>
+
+        <div class="stat-card">
+          <p data-i18n="dailyAverage">Daily Average</p>
+          <h2 id="dailyAverage" class="analytics-stat">0</h2>
+          <p class="analytics-muted" data-i18n="averageDailySpending">
+            Average spending per day
+          </p>
+        </div>
+
+        <div class="stat-card">
+          <p data-i18n="highestExpense">Highest Expense</p>
+          <h2 id="highestExpense" class="analytics-stat">0</h2>
+          <p id="highestExpenseName" class="analytics-muted">—</p>
+        </div>
+
+        <div class="stat-card">
+          <p data-i18n="transactions">Transactions</p>
+          <h2 id="transactionCount" class="analytics-stat">0</h2>
+          <p class="analytics-muted" data-i18n="recordedExpenses">
+            Recorded expenses
+          </p>
+        </div>
+
+      </div>
+
+      <div class="analytics-grid">
+
+        <div class="analytics-card">
+          <h3 data-i18n="spendingTrend">Spending Trend</h3>
+          <p class="analytics-muted" data-i18n="sixMonthTrend">
+            Your spending over the last six months
+          </p>
+          <div id="trendChart" class="trend-list">
+            <p class="analytics-empty">Loading...</p>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <h3 data-i18n="categoryBreakdown">Category Breakdown</h3>
+          <p class="analytics-muted" data-i18n="categoryBreakdownDescription">
+            See which categories take the largest share.
+          </p>
+          <div id="categoryChart" class="category-list">
+            <p class="analytics-empty">Loading...</p>
+          </div>
+        </div>
+
+        <div class="analytics-card analytics-wide">
+          <h3 data-i18n="spendingInsights">Spending Insights</h3>
+          <p class="analytics-muted" data-i18n="spendingInsightsDescription">
+            A quick summary of your financial activity.
+          </p>
+
+          <div id="insightsContainer">
+            <div class="insight-box" data-i18n="insightLoading">
+              Your insights will appear here.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<script src="app.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.Kharcha) {
+    console.error("Kharcha app.js could not be loaded.");
+    return;
+  }
+
+  const K = window.Kharcha;
+
+  const monthInput = document.getElementById("analyticsMonth");
+  const languageSelect = document.getElementById("languageSelect");
+
+  const currentMonth = K.getCurrentMonth();
+  monthInput.value = currentMonth;
+
+  languageSelect.value = K.getLanguage();
+
+  languageSelect.addEventListener("change", () => {
+    K.setLanguage(languageSelect.value);
+    renderAnalytics();
+  });
+
+  monthInput.addEventListener("change", renderAnalytics);
+
+  function money(amount) {
+    return K.formatCurrency(Number(amount) || 0);
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+  }
+
+  function getMonthExpenses(month) {
+    return K.getExpenses().filter(expense =>
+      String(expense.date || "").slice(0, 7) === month
+    );
+  }
+
+  function getMonthLabel(month) {
+    const [year, monthNumber] = month.split("-").map(Number);
+    const date = new Date(year, monthNumber - 1, 1);
+
+    const language = K.getLanguage();
+
+    if (language === "ur") {
+      return date.toLocaleDateString("ur-PK", {
+        month: "short",
+        year: "numeric"
+      });
+    }
+
+    return date.toLocaleDateString("en-GB", {
+      month: "short",
+      year: "numeric"
+    });
+  }
+
+  function renderStats(expenses, month) {
+    const total = expenses.reduce(
+      (sum, expense) => sum + Number(expense.amount || 0), 0
+    );
+
+    const daysInMonth = new Date(
+      Number(month.slice(0, 4)),
+      Number(month.slice(5, 7)),
+      0
+    ).getDate();
+
+    const daily = total / daysInMonth;
+
+    const highest = expenses.reduce((max, expense) =>
+      Number(expense.amount || 0) > Number(max?.amount || 0)
+        ? expense
+        : max, null
+    );
+
+    document.getElementById("totalSpent").textContent = money(total);
+    document.getElementById("dailyAverage").textContent = money(daily);
+    document.getElementById("transactionCount").textContent = expenses.length;
+
+    document.getElementById("highestExpense").textContent =
+      highest ? money(highest.amount) : money(0);
+
+    document.getElementById("highestExpenseName").textContent =
+      highest ? escapeHTML(highest.description || highest.category || "Expense") : "—";
+  }
+
+  function renderTrend(month) {
+    const container = document.getElementById("trendChart");
+    const [year, monthNumber] = month.split("-").map(Number);
+
+    const months = [];
+
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(year, monthNumber - 1 - i, 1);
+      const key = [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0")
+      ].join("-");
+
+      const total = getMonthExpenses(key).reduce(
+        (sum, expense) => sum + Number(expense.amount || 0), 0
+      );
+
+      months.push({ key, total });
+    }
+
+    const max = Math.max(...months.map(item => item.total), 1);
+
+    if (months.every(item => item.total === 0)) {
+      container.innerHTML = `
+        <p class="analytics-empty" data-i18n="noTrendData">
+          Add expenses to see your spending trend.
+        </p>`;
+      return;
+    }
+
+    container.innerHTML = months.map(item => `
+      <div class="trend-item">
+        <div class="trend-label">
+          <span>${escapeHTML(getMonthLabel(item.key))}</span>
+          <strong>${money(item.total)}</strong>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${(item.total / max) * 100}%"></div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function renderCategories(expenses) {
+    const container = document.getElementById("categoryChart");
+
+    const totals = {};
+
+    expenses.forEach(expense => {
+      const category = expense.category || "other";
+      totals[category] = (totals[category] || 0) +
+        Number(expense.amount || 0);
+    });
+
+    const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+
+    const total = entries.reduce((sum, entry) => sum + entry[1], 0);
+
+    if (!entries.length || total === 0) {
+      container.innerHTML = `
+        <p class="analytics-empty" data-i18n="noCategoryData">
+          No category data available yet.
+        </p>`;
+      return;
+    }
+
+    container.innerHTML = entries.map(([category, amount]) => {
+      const percentage = (amount / total) * 100;
+
+      let label = category;
+
+      try {
+        label = K.translate(category);
+      } catch (error) {}
+
+      return `
+        <div class="category-item">
+          <div class="category-label">
+            <span>${escapeHTML(label)}</span>
+            <strong>${money(amount)} · ${percentage.toFixed(1)}%</strong>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill category-fill"
+              style="width:${percentage}%"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderInsights(expenses, month) {
+    const container = document.getElementById("insightsContainer");
+
+    const total = expenses.reduce(
+      (sum, expense) => sum + Number(expense.amount || 0), 0
+    );
+
+    const budget = Number(K.getMonthlySummary(month).budget || 0);
+
+    const categoryTotals = {};
+
+    expenses.forEach(expense => {
+      const category = expense.category || "other";
+      categoryTotals[category] = (categoryTotals[category] || 0) +
+        Number(expense.amount || 0);
+    });
+
+    const topCategory = Object.entries(categoryTotals)
+      .sort((a, b) => b[1] - a[1])[0];
+
+    let message = "";
+
+    if (expenses.length === 0) {
+      message = K.translate("insightNoExpenses");
+    } else {
+      message = `${K.translate("insightTotal")}: ${money(total)}. `;
+
+      if (topCategory) {
+        let categoryName = topCategory[0];
+
+        try {
+          categoryName = K.translate(topCategory[0]);
+        } catch (error) {}
+
+        message += `${K.translate("insightTopCategory")}: ${categoryName} (${money(topCategory[1])}). `;
+      }
+
+      if (budget > 0) {
+        const remaining = budget - total;
+
+        if (remaining < 0) {
+          message += `${K.translate("insightOverBudget")} ${money(Math.abs(remaining))}.`;
+        } else {
+          message += `${K.translate("insightRemaining")} ${money(remaining)}.`;
+        }
+      } else {
+        message += K.translate("insightSetBudget");
+      }
+    }
+
+    container.innerHTML = `
+      <div class="insight-box">${escapeHTML(message)}</div>
+    `;
+  }
+
+  function renderAnalytics() {
+    const month = monthInput.value || K.getCurrentMonth();
+    const expenses = getMonthExpenses(month);
+
+    renderStats(expenses, month);
+    renderTrend(month);
+    renderCategories(expenses);
+    renderInsights(expenses, month);
+  }
+
+  K.applyTranslations();
+  renderAnalytics();
+});
+</script>
+
+</body>
+</html>
