@@ -950,18 +950,18 @@ html[dir="rtl"] .stat-card::after {
   html[dir="rtl"] .sidebar {
     border-left: none;
   }
+
 }
+
 .brand-logo {
-    width: 48px;
-    height: 48px;
-    overflow: hidden;
-    border-radius: 12px;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .brand-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+  display: block;
 }
