@@ -746,3 +746,208 @@ tbody tr:hover {
     padding: 18px 12px;
   }
 }
+
+/* =========================================================
+   KHARCHA — MOBILE RESPONSIVENESS FIX
+   ========================================================= */
+
+/* Prevent horizontal overflow */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.app-layout {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.main-content {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Allow nested content to shrink */
+.main-content *,
+.card,
+.page-section,
+.dashboard-grid,
+.stats-grid,
+.topbar,
+.topbar-actions {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dashboard-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Tables remain scrollable inside their own container */
+.table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Mobile and smaller tablets */
+@media screen and (max-width: 800px) {
+
+  .app-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 16px;
+    gap: 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-section {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 7px;
+    width: 100%;
+  }
+
+  .nav-label,
+  .sidebar-bottom {
+    display: none;
+  }
+
+  .nav-link {
+    flex: 0 1 auto;
+    padding: 9px 11px;
+    font-size: 12px;
+  }
+
+  .main-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 14px;
+    margin: 0;
+  }
+
+  .topbar {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card {
+    width: 100%;
+    padding: 17px;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .filters > * {
+    max-width: 100%;
+    flex: 1 1 140px;
+  }
+
+  .settings-item {
+    flex-wrap: wrap;
+  }
+}
+
+/* Smaller phones */
+@media screen and (max-width: 480px) {
+
+  .main-content {
+    padding: 16px 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card {
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .page-heading h1 {
+    font-size: 25px;
+  }
+
+  .section-heading {
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    padding: 8px 9px;
+    font-size: 11px;
+  }
+
+  .btn {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+  }
+
+  .stat-value {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Urdu right-to-left layout */
+html[dir="rtl"] body {
+  text-align: right;
+}
+
+html[dir="rtl"] .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+html[dir="rtl"] th {
+  text-align: right;
+}
+
+html[dir="rtl"] .stat-card::after {
+  right: auto;
+  left: -45px;
+}
+
+@media screen and (max-width: 800px) {
+  html[dir="rtl"] .sidebar {
+    border-left: none;
+  }
+}
