@@ -1,0 +1,596 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d18">
+  <meta name="description" content="Manage, search and track your expenses with Kharcha.">
+  <title>Expenses | Kharcha</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .expense-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .expense-summary .card {
+      padding: 20px;
+    }
+
+    .expense-summary .stat-value {
+      font-size: 23px;
+      margin-top: 10px;
+    }
+
+    .expense-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .expense-toolbar input,
+    .expense-toolbar select {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .expense-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .expense-table th,
+    .expense-table td {
+      padding: 15px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .expense-table th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .expense-table td {
+      color: var(--text);
+    }
+
+    .expense-category {
+      display: inline-block;
+      padding: 5px 10px;
+      background: rgba(59,130,246,.12);
+      color: var(--blue-light);
+      border-radius: 20px;
+      font-size: 11px;
+    }
+
+    .delete-btn {
+      border: 0;
+      background: rgba(239,68,68,.1);
+      color: #f87171;
+      padding: 7px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .delete-btn:hover {
+      background: rgba(239,68,68,.2);
+    }
+
+    .expense-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,.7);
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .expense-modal.show {
+      display: flex;
+    }
+
+    .expense-modal-content {
+      width: 100%;
+      max-width: 470px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 25px;
+    }
+
+    .modal-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .modal-close {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      font-size: 25px;
+      cursor: pointer;
+    }
+
+    .expense-form .form-group {
+      margin-bottom: 15px;
+    }
+
+    .expense-form button {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .table-empty {
+      text-align: center;
+      padding: 35px 15px !important;
+      color: var(--muted) !important;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    [dir="rtl"] .expense-table th,
+    [dir="rtl"] .expense-table td {
+      text-align: right;
+    }
+
+    [dir="rtl"] .expense-modal-content {
+      text-align: right;
+    }
+
+    @media(max-width: 700px) {
+      .expense-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .expense-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .expense-toolbar input,
+      .expense-toolbar select {
+        width: 100%;
+      }
+
+      .expense-table {
+        min-width: 600px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <a href="index.html" class="brand">
+      <div class="brand-logo">₹</div>
+      <div class="brand-name">Khar<span>cha</span></div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label" data-i18n="workspace">Workspace</div>
+
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">⌂</span>
+        <span data-i18n="dashboard">Dashboard</span>
+      </a>
+
+      <a href="expenses.html" class="nav-link active">
+        <span class="nav-icon">↗</span>
+        <span data-i18n="expenses">Expenses</span>
+      </a>
+
+      <a href="budgets.html" class="nav-link">
+        <span class="nav-icon">◫</span>
+        <span data-i18n="budgets">Budgets</span>
+      </a>
+
+      <a href="analytics.html" class="nav-link">
+        <span class="nav-icon">▥</span>
+        <span data-i18n="analytics">Analytics</span>
+      </a>
+
+      <a href="reports.html" class="nav-link">
+        <span class="nav-icon">▤</span>
+        <span data-i18n="reports">Reports</span>
+      </a>
+    </div>
+
+    <div class="nav-section sidebar-bottom">
+      <div class="nav-label" data-i18n="preferences">Preferences</div>
+
+      <a href="settings.html" class="nav-link">
+        <span class="nav-icon">⚙</span>
+        <span data-i18n="settings">Settings</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <header class="topbar">
+
+      <div class="page-heading">
+        <h1 data-i18n="expenses">Expenses</h1>
+        <p data-i18n="expensesSubtitle">
+          Manage and review your spending.
+        </p>
+      </div>
+
+      <div class="topbar-actions">
+
+        <select id="languageSelect" class="language-select"
+          aria-label="Choose language">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="roman">Roman Urdu</option>
+        </select>
+
+      </div>
+
+    </header>
+
+    <!-- SUMMARY CARDS -->
+    <section class="expense-summary">
+
+      <div class="card stat-card expense">
+        <div class="stat-label" data-i18n="totalSpent">Total Spent</div>
+        <div class="stat-value" id="totalSpent">PKR 0</div>
+        <div class="stat-note" data-i18n="selectedMonthTotal">
+          For selected month
+        </div>
+      </div>
+
+      <div class="card stat-card balance">
+        <div class="stat-label" data-i18n="transactions">Transactions</div>
+        <div class="stat-value" id="transactionTotal">0</div>
+        <div class="stat-note" data-i18n="recordedExpenses">
+          Recorded expenses
+        </div>
+      </div>
+
+      <div class="card stat-card income">
+        <div class="stat-label" data-i18n="averageExpense">Average Expense</div>
+        <div class="stat-value" id="averageExpense">PKR 0</div>
+        <div class="stat-note" data-i18n="perTransaction">
+          Per transaction
+        </div>
+      </div>
+
+    </section>
+
+    <!-- EXPENSE MANAGEMENT -->
+    <section class="card">
+
+      <div class="section-heading">
+
+        <div>
+          <h2 data-i18n="allExpenses">All Expenses</h2>
+
+          <p class="card-description" data-i18n="expensesDescription">
+            Search, filter, and manage your transactions.
+          </p>
+        </div>
+
+        <button class="btn btn-primary" id="openExpenseModal">
+          + <span data-i18n="addExpense">Add Expense</span>
+        </button>
+
+      </div>
+
+      <!-- FILTERS -->
+      <div class="expense-toolbar">
+
+        <input type="search" id="searchExpense"
+          data-i18n-placeholder="searchExpenses"
+          placeholder="Search expenses...">
+
+        <select id="filterCategory">
+          <option value="all" data-i18n="allCategories">All Categories</option>
+          <option value="food" data-i18n="food">Food</option>
+          <option value="transport" data-i18n="transport">Transport</option>
+          <option value="shopping" data-i18n="shopping">Shopping</option>
+          <option value="bills" data-i18n="bills">Bills</option>
+          <option value="health" data-i18n="health">Health</option>
+          <option value="entertainment" data-i18n="entertainment">Entertainment</option>
+          <option value="education" data-i18n="education">Education</option>
+          <option value="other" data-i18n="other">Other</option>
+        </select>
+
+        <input type="month" id="filterMonth"
+          aria-label="Filter by month">
+
+      </div>
+
+      <!-- EXPENSE TABLE -->
+      <div class="table-responsive">
+
+        <table class="expense-table">
+
+          <thead>
+            <tr>
+              <th data-i18n="description">Description</th>
+              <th data-i18n="category">Category</th>
+              <th data-i18n="date">Date</th>
+              <th data-i18n="amount">Amount</th>
+              <th data-i18n="actions">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody id="expenseTableBody"></tbody>
+
+        </table>
+
+      </div>
+
+      <div id="expenseCount" class="stat-note" style="margin-top:15px"></div>
+
+    </section>
+
+    <footer class="app-footer">
+      Kharcha © 2026 | Created by Mubashir Malik. All rights reserved.
+    </footer>
+
+  </main>
+
+</div>
+
+<!-- ADD EXPENSE MODAL -->
+<div class="expense-modal" id="expenseModal">
+
+  <div class="expense-modal-content">
+
+    <div class="modal-heading">
+      <h2 data-i18n="addExpense">Add Expense</h2>
+
+      <button class="modal-close" id="closeExpenseModal"
+        aria-label="Close">×</button>
+    </div>
+
+    <form id="expenseForm" class="expense-form">
+
+      <div class="form-group">
+        <label for="description" data-i18n="description">Description</label>
+
+        <input id="description" type="text"
+          data-i18n-placeholder="descriptionPlaceholder"
+          placeholder="e.g. Grocery shopping" required>
+      </div>
+
+      <div class="form-group">
+        <label for="amount" data-i18n="amount">Amount (PKR)</label>
+
+        <input id="amount" type="number"
+          min="0.01" step="0.01" placeholder="500" required>
+      </div>
+
+      <div class="form-group">
+        <label for="category" data-i18n="category">Category</label>
+
+        <select id="category" required>
+          <option value="food" data-i18n="food">Food</option>
+          <option value="transport" data-i18n="transport">Transport</option>
+          <option value="shopping" data-i18n="shopping">Shopping</option>
+          <option value="bills" data-i18n="bills">Bills</option>
+          <option value="health" data-i18n="health">Health</option>
+          <option value="entertainment" data-i18n="entertainment">Entertainment</option>
+          <option value="education" data-i18n="education">Education</option>
+          <option value="other" data-i18n="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="date" data-i18n="date">Date</label>
+        <input id="date" type="date" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary"
+        data-i18n="saveExpense">
+        Save Expense
+      </button>
+
+      <p id="formMessage" class="success-message" aria-live="polite"></p>
+
+    </form>
+
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[character]);
+  }
+
+  function money(amount) {
+    return Kharcha.formatCurrency(amount);
+  }
+
+  function translate(key) {
+    return Kharcha.translate(key);
+  }
+
+  function renderExpenses() {
+    const month = $("filterMonth").value;
+    const category = $("filterCategory").value;
+    const search = $("searchExpense").value.toLowerCase().trim();
+
+    const allExpenses = Kharcha.getExpenses();
+
+    const monthlyExpenses = month
+      ? allExpenses.filter(item => String(item.date).startsWith(month))
+      : allExpenses;
+
+    const filteredExpenses = monthlyExpenses
+      .filter(item => category === "all" || item.category === category)
+      .filter(item =>
+        String(item.description).toLowerCase().includes(search)
+      )
+      .sort((a, b) =>
+        String(b.date).localeCompare(String(a.date))
+      );
+
+    const total = monthlyExpenses.reduce(
+      (sum, item) => sum + Number(item.amount), 0
+    );
+
+    const average = monthlyExpenses.length
+      ? total / monthlyExpenses.length
+      : 0;
+
+    $("totalSpent").textContent = money(total);
+    $("transactionTotal").textContent = monthlyExpenses.length;
+    $("averageExpense").textContent = money(average);
+
+    $("expenseCount").textContent =
+      `${filteredExpenses.length} ${translate("resultsFound")}`;
+
+    const body = $("expenseTableBody");
+
+    if (!filteredExpenses.length) {
+      body.innerHTML = `
+        <tr>
+          <td colspan="5" class="table-empty">
+            ${escapeHTML(translate("noTransactions"))}
+          </td>
+        </tr>`;
+      return;
+    }
+
+    body.innerHTML = filteredExpenses.map(item => `
+      <tr>
+        <td>${escapeHTML(item.description)}</td>
+
+        <td>
+          <span class="expense-category">
+            ${escapeHTML(translate(item.category))}
+          </span>
+        </td>
+
+        <td>${escapeHTML(item.date)}</td>
+
+        <td class="amount-negative">
+          ${money(item.amount)}
+        </td>
+
+        <td>
+          <button class="delete-btn"
+            data-delete-id="${escapeHTML(item.id)}">
+            ${escapeHTML(translate("delete"))}
+          </button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function openModal() {
+    $("expenseModal").classList.add("show");
+    $("date").value = new Date().toISOString().slice(0, 10);
+    $("formMessage").textContent = "";
+  }
+
+  function closeModal() {
+    $("expenseModal").classList.remove("show");
+    $("expenseForm").reset();
+  }
+
+  $("openExpenseModal").addEventListener("click", openModal);
+
+  $("closeExpenseModal").addEventListener("click", closeModal);
+
+  $("expenseModal").addEventListener("click", event => {
+    if (event.target === $("expenseModal")) {
+      closeModal();
+    }
+  });
+
+  $("expenseForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    try {
+      Kharcha.addExpense({
+        description: $("description").value,
+        amount: $("amount").value,
+        category: $("category").value,
+        date: $("date").value
+      });
+
+      closeModal();
+      renderExpenses();
+
+    } catch (error) {
+      $("formMessage").textContent = error.message;
+    }
+  });
+
+  $("expenseTableBody").addEventListener("click", event => {
+    const button = event.target.closest("[data-delete-id]");
+
+    if (!button) return;
+
+    if (!confirm(translate("confirmDelete"))) return;
+
+    Kharcha.deleteExpense(button.dataset.deleteId);
+    renderExpenses();
+  });
+
+  $("searchExpense").addEventListener("input", renderExpenses);
+
+  $("filterCategory").addEventListener("change", renderExpenses);
+
+  $("filterMonth").addEventListener("change", renderExpenses);
+
+  $("languageSelect").addEventListener("change", event => {
+    Kharcha.setLanguage(event.target.value);
+    renderExpenses();
+  });
+
+  function initializeExpenses() {
+    $("languageSelect").value = Kharcha.getLanguage();
+    $("filterMonth").value = Kharcha.getCurrentMonth();
+
+    Kharcha.applyTranslations();
+    renderExpenses();
+  }
+
+  initializeExpenses();
+</script>
+
+</body>
+</html>
