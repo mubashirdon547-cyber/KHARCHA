@@ -8,6 +8,7 @@
   <meta name="description" content="Kharcha - A simple and smart personal expense tracker.">
   <title>Kharcha | Personal Finance Dashboard</title>
   <link rel="stylesheet" href="style.css">
+
   <style>
     .welcome-banner {
       background: linear-gradient(115deg, #15376b, #10264a 55%, #101827);
@@ -74,30 +75,6 @@
       margin-top: 9px;
     }
 
-    .summary-number {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 7px;
-    }
-
-    .transaction-actions {
-      display: flex;
-      gap: 7px;
-    }
-
-    .small-action {
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 6px 9px;
-      font-size: 11px;
-    }
-
-    .small-action:hover {
-      border-color: var(--blue);
-    }
-
     .dashboard-bottom {
       display: grid;
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
@@ -144,6 +121,28 @@
       min-height: 18px;
     }
 
+    [dir="rtl"] body {
+      text-align: right;
+    }
+
+    [dir="rtl"] .app-layout {
+      direction: rtl;
+    }
+
+    [dir="rtl"] .welcome-banner::after {
+      right: auto;
+      left: 35px;
+    }
+
+    [dir="rtl"] .category-info {
+      direction: rtl;
+    }
+
+    [dir="rtl"] th,
+    [dir="rtl"] td {
+      text-align: right;
+    }
+
     @media(max-width: 720px) {
       .dashboard-bottom {
         grid-template-columns: 1fr;
@@ -185,40 +184,40 @@
     </a>
 
     <div class="nav-section">
-      <div class="nav-label">Workspace</div>
+      <div class="nav-label" data-i18n="workspace">Workspace</div>
 
       <a href="index.html" class="nav-link active">
         <span class="nav-icon">⌂</span>
-        Dashboard
+        <span data-i18n="dashboard">Dashboard</span>
       </a>
 
       <a href="expenses.html" class="nav-link">
         <span class="nav-icon">↗</span>
-        Expenses
+        <span data-i18n="expenses">Expenses</span>
       </a>
 
       <a href="budgets.html" class="nav-link">
         <span class="nav-icon">◫</span>
-        Budgets
+        <span data-i18n="budgets">Budgets</span>
       </a>
 
       <a href="analytics.html" class="nav-link">
         <span class="nav-icon">▥</span>
-        Analytics
+        <span data-i18n="analytics">Analytics</span>
       </a>
 
       <a href="reports.html" class="nav-link">
         <span class="nav-icon">▤</span>
-        Reports
+        <span data-i18n="reports">Reports</span>
       </a>
     </div>
 
     <div class="nav-section sidebar-bottom">
-      <div class="nav-label">Preferences</div>
+      <div class="nav-label" data-i18n="preferences">Preferences</div>
 
       <a href="settings.html" class="nav-link">
         <span class="nav-icon">⚙</span>
-        Settings
+        <span data-i18n="settings">Settings</span>
       </a>
     </div>
 
@@ -231,8 +230,8 @@
     <header class="topbar">
 
       <div class="page-heading">
-        <h1>Dashboard</h1>
-        <p>Your personal financial overview.</p>
+        <h1 data-i18n="dashboard">Dashboard</h1>
+        <p data-i18n="dashboardSubtitle">Your personal financial overview.</p>
       </div>
 
       <div class="topbar-actions">
@@ -254,15 +253,15 @@
     <!-- WELCOME -->
     <section class="welcome-banner">
 
-      <h2>Take control of your money.</h2>
+      <h2 data-i18n="welcome">Take control of your money.</h2>
 
-      <p>
+      <p data-i18n="welcomeText">
         Track your spending, manage your budget,
         and make better financial decisions.
       </p>
 
       <a href="#addExpense" class="btn btn-primary">
-        + Add an expense
+        + <span data-i18n="addExpense">Add an expense</span>
       </a>
 
     </section>
@@ -271,45 +270,25 @@
     <section class="stats-grid">
 
       <div class="card stat-card balance">
-
-        <div class="stat-label">Monthly Budget</div>
-
-        <div class="stat-value" id="budgetValue">
-          PKR 0
-        </div>
-
-        <div class="stat-note">
+        <div class="stat-label" data-i18n="monthlyBudget">Monthly Budget</div>
+        <div class="stat-value" id="budgetValue">PKR 0</div>
+        <div class="stat-note" data-i18n="budgetNote">
           Your planned monthly spending limit
         </div>
-
       </div>
 
       <div class="card stat-card expense">
-
-        <div class="stat-label">Total Spent</div>
-
-        <div class="stat-value" id="spentValue">
-          PKR 0
-        </div>
-
-        <div class="stat-note" id="transactionCount">
-          0 transactions this month
-        </div>
-
+        <div class="stat-label" data-i18n="totalSpent">Total Spent</div>
+        <div class="stat-value" id="spentValue">PKR 0</div>
+        <div class="stat-note" id="transactionCount">0</div>
       </div>
 
       <div class="card stat-card income">
-
-        <div class="stat-label">Remaining Balance</div>
-
-        <div class="stat-value" id="remainingValue">
-          PKR 0
-        </div>
-
-        <div class="stat-note">
+        <div class="stat-label" data-i18n="remaining">Remaining Balance</div>
+        <div class="stat-value" id="remainingValue">PKR 0</div>
+        <div class="stat-note" data-i18n="remainingNote">
           Money left from your monthly budget
         </div>
-
       </div>
 
     </section>
@@ -317,37 +296,31 @@
     <!-- MAIN DASHBOARD GRID -->
     <section class="dashboard-grid">
 
-      <!-- BUDGET OVERVIEW -->
       <div class="card">
 
-        <div class="card-title">Budget Overview</div>
+        <div class="card-title" data-i18n="budgetOverview">Budget Overview</div>
 
-        <div class="card-description">
+        <div class="card-description" data-i18n="budgetDescription">
           Monitor how much of your budget you've used.
         </div>
 
         <div class="budget-big" id="budgetPercentage">
-          0%
-          <span>of your budget used</span>
+          0% <span data-i18n="budgetUsed">of your budget used</span>
         </div>
 
         <div class="progress-track">
-          <div class="progress-fill" id="budgetProgress"
-            style="width:0%">
-          </div>
+          <div class="progress-fill" id="budgetProgress" style="width:0%"></div>
         </div>
 
         <div class="progress-details">
-          <span id="budgetSpentLabel">PKR 0 spent</span>
-          <span id="budgetLimitLabel">PKR 0 limit</span>
+          <span id="budgetSpentLabel">PKR 0</span>
+          <span id="budgetLimitLabel">PKR 0</span>
         </div>
 
-        <div id="budgetWarning" class="notice" style="margin-top:20px">
-          Start tracking your monthly spending.
-        </div>
+        <div id="budgetWarning" class="notice warning" style="margin-top:20px"></div>
 
         <button class="btn btn-secondary btn-full"
-          id="setBudgetButton">
+          id="setBudgetButton" data-i18n="setBudget">
           Set Monthly Budget
         </button>
 
@@ -356,54 +329,53 @@
       <!-- QUICK EXPENSE FORM -->
       <div class="card" id="addExpense">
 
-        <div class="card-title">Quick Add Expense</div>
+        <div class="card-title" data-i18n="quickAdd">Quick Add Expense</div>
 
-        <div class="card-description">
+        <div class="card-description" data-i18n="quickDescription">
           Record a purchase in seconds.
         </div>
 
         <form id="expenseForm" class="quick-form">
 
           <div class="form-group full">
-            <label for="expenseDescription">Description</label>
+            <label for="expenseDescription" data-i18n="description">Description</label>
             <input id="expenseDescription" type="text"
+              data-i18n-placeholder="descriptionPlaceholder"
               placeholder="e.g. Grocery shopping" required>
           </div>
 
           <div class="form-group">
-            <label for="expenseAmount">Amount (PKR)</label>
+            <label for="expenseAmount" data-i18n="amount">Amount (PKR)</label>
             <input id="expenseAmount" type="number"
               min="0.01" step="0.01" placeholder="500" required>
           </div>
 
           <div class="form-group">
-            <label for="expenseCategory">Category</label>
+            <label for="expenseCategory" data-i18n="category">Category</label>
             <select id="expenseCategory" required>
-              <option value="food">Food</option>
-              <option value="transport">Transport</option>
-              <option value="shopping">Shopping</option>
-              <option value="bills">Bills</option>
-              <option value="health">Health</option>
-              <option value="entertainment">Entertainment</option>
-              <option value="education">Education</option>
-              <option value="other">Other</option>
+              <option value="food" data-i18n="food">Food</option>
+              <option value="transport" data-i18n="transport">Transport</option>
+              <option value="shopping" data-i18n="shopping">Shopping</option>
+              <option value="bills" data-i18n="bills">Bills</option>
+              <option value="health" data-i18n="health">Health</option>
+              <option value="entertainment" data-i18n="entertainment">Entertainment</option>
+              <option value="education" data-i18n="education">Education</option>
+              <option value="other" data-i18n="other">Other</option>
             </select>
           </div>
 
           <div class="form-group full">
-            <label for="expenseDate">Date</label>
+            <label for="expenseDate" data-i18n="date">Date</label>
             <input id="expenseDate" type="date" required>
           </div>
 
           <button type="submit" class="btn btn-primary full">
-            + Save Expense
+            + <span data-i18n="saveExpense">Save Expense</span>
           </button>
 
         </form>
 
-        <div id="expenseMessage" class="success-message"
-          aria-live="polite">
-        </div>
+        <div id="expenseMessage" class="success-message" aria-live="polite"></div>
 
       </div>
 
@@ -412,95 +384,61 @@
     <!-- LOWER DASHBOARD -->
     <section class="dashboard-bottom">
 
-      <!-- CATEGORY BREAKDOWN -->
       <div class="card">
 
         <div class="section-heading">
-          <h2>Spending by Category</h2>
+          <h2 data-i18n="spendingCategory">Spending by Category</h2>
         </div>
 
-        <div class="card-description">
+        <div class="card-description" data-i18n="categoryDescription">
           Understand where your money goes.
         </div>
 
-        <div class="category-list" id="categoryList">
-
-          <div class="empty-state">
-            <div class="empty-state-icon">◌</div>
-            <h3>No spending yet</h3>
-            <p>Your category breakdown will appear here.</p>
-          </div>
-
-        </div>
+        <div class="category-list" id="categoryList"></div>
 
       </div>
 
-      <!-- RECENT TRANSACTIONS -->
       <div class="card">
 
         <div class="section-heading">
-          <h2>Recent Transactions</h2>
+          <h2 data-i18n="recentTransactions">Recent Transactions</h2>
+
           <a href="expenses.html"
-            style="color:var(--blue-light);font-size:12px">
+            style="color:var(--blue-light);font-size:12px"
+            data-i18n="viewAll">
             View all →
           </a>
         </div>
 
         <div class="table-wrapper">
-
           <table>
             <thead>
               <tr>
-                <th>Description</th>
-                <th>Amount</th>
+                <th data-i18n="description">Description</th>
+                <th data-i18n="amount">Amount</th>
               </tr>
             </thead>
 
-            <tbody id="recentTransactions">
-
-              <tr>
-                <td colspan="2">
-                  <div class="empty-state">
-                    No transactions recorded.
-                  </div>
-                </td>
-              </tr>
-
-            </tbody>
+            <tbody id="recentTransactions"></tbody>
           </table>
-
         </div>
 
       </div>
 
     </section>
 
-    <!-- FOOTER -->
     <footer class="app-footer">
-      Kharcha © 2026 | Created by Mubashir Malik.
-      All rights reserved.
+      Kharcha © 2026 | Created by Mubashir Malik. All rights reserved.
     </footer>
 
   </main>
 
 </div>
 
-<!-- APPLICATION ENGINE -->
 <script src="app.js"></script>
 
 <script>
   const $ = id => document.getElementById(id);
-
-  const categoryNames = {
-    food: "Food",
-    transport: "Transport",
-    shopping: "Shopping",
-    bills: "Bills",
-    health: "Health",
-    entertainment: "Entertainment",
-    education: "Education",
-    other: "Other"
-  };
 
   function escapeHTML(value) {
     return String(value).replace(/[&<>"']/g, character => ({
@@ -523,20 +461,21 @@
   function renderDashboard() {
     const month = selectedMonth();
     const summary = Kharcha.getMonthlySummary(month);
+    const t = key => Kharcha.translate(key);
 
     $("budgetValue").textContent = money(summary.budget);
     $("spentValue").textContent = money(summary.spent);
     $("remainingValue").textContent = money(summary.remaining);
 
     $("transactionCount").textContent =
-      `${summary.transactionCount} transactions this month`;
+      `${summary.transactionCount} ${t("spentNote")}`;
 
     const percentage = summary.budget > 0
       ? Math.round(summary.percentage)
       : 0;
 
     $("budgetPercentage").innerHTML =
-      `${percentage}% <span>of your budget used</span>`;
+      `${percentage}% <span>${t("budgetUsed")}</span>`;
 
     $("budgetProgress").style.width =
       `${Math.min(percentage, 100)}%`;
@@ -547,29 +486,25 @@
     );
 
     $("budgetSpentLabel").textContent =
-      `${money(summary.spent)} spent`;
+      `${money(summary.spent)} ${t("spent")}`;
 
     $("budgetLimitLabel").textContent =
-      `${money(summary.budget)} limit`;
+      `${money(summary.budget)} ${t("limit")}`;
 
     const warning = $("budgetWarning");
 
     if (summary.budget === 0) {
       warning.className = "notice warning";
-      warning.textContent =
-        "Set a monthly budget to start monitoring your spending.";
+      warning.textContent = t("setBudgetMessage");
     } else if (percentage >= 100) {
       warning.className = "notice danger";
-      warning.textContent =
-        "You have reached or exceeded your monthly budget.";
+      warning.textContent = t("exceededMessage");
     } else if (percentage >= 80) {
       warning.className = "notice warning";
-      warning.textContent =
-        "You've used most of your budget. Keep an eye on spending.";
+      warning.textContent = t("warningMessage");
     } else {
       warning.className = "notice";
-      warning.textContent =
-        "Your spending is currently within your monthly budget.";
+      warning.textContent = t("withinBudgetMessage");
     }
 
     renderCategories(month);
@@ -579,6 +514,7 @@
   function renderCategories(month) {
     const totals = Kharcha.getCategoryTotals(month);
     const list = $("categoryList");
+    const t = key => Kharcha.translate(key);
 
     const entries = Object.entries(totals)
       .sort((a, b) => b[1] - a[1]);
@@ -587,8 +523,8 @@
       list.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">◌</div>
-          <h3>No spending yet</h3>
-          <p>Your category breakdown will appear here.</p>
+          <h3>${escapeHTML(t("noSpending"))}</h3>
+          <p>${escapeHTML(t("categoryEmpty"))}</p>
         </div>`;
       return;
     }
@@ -596,23 +532,19 @@
     const total = entries.reduce((sum, entry) => sum + entry[1], 0);
 
     list.innerHTML = entries.map(([category, amount]) => {
-      const percentage = total > 0
-        ? (amount / total) * 100
-        : 0;
+      const percentage = total > 0 ? (amount / total) * 100 : 0;
 
       return `
         <div class="category-item">
           <div class="category-info">
             <span class="category-row">
               <span class="category-dot"></span>
-              ${escapeHTML(categoryNames[category] || category)}
+              ${escapeHTML(t(category))}
             </span>
             <span>${money(amount)}</span>
           </div>
           <div class="category-track">
-            <div class="category-fill"
-              style="width:${percentage}%">
-            </div>
+            <div class="category-fill" style="width:${percentage}%"></div>
           </div>
         </div>`;
     }).join("");
@@ -624,14 +556,13 @@
       .slice(0, 5);
 
     const body = $("recentTransactions");
+    const t = key => Kharcha.translate(key);
 
     if (!transactions.length) {
       body.innerHTML = `
         <tr>
           <td colspan="2">
-            <div class="empty-state">
-              No transactions recorded.
-            </div>
+            <div class="empty-state">${escapeHTML(t("noTransactions"))}</div>
           </td>
         </tr>`;
       return;
@@ -644,8 +575,7 @@
             ${escapeHTML(expense.description)}
           </div>
           <div class="transaction-category">
-            ${escapeHTML(categoryNames[expense.category] || expense.category)}
-            · ${escapeHTML(expense.date)}
+            ${escapeHTML(t(expense.category))} · ${escapeHTML(expense.date)}
           </div>
         </td>
         <td class="amount-negative">
@@ -668,7 +598,7 @@
 
       $("expenseForm").reset();
       $("expenseDate").value = new Date().toISOString().slice(0, 10);
-      $("expenseMessage").textContent = "Expense saved successfully.";
+      $("expenseMessage").textContent = Kharcha.translate("saved");
 
       renderDashboard();
 
@@ -683,7 +613,7 @@
     const current = Kharcha.getMonthlyBudget(selectedMonth());
 
     const answer = prompt(
-      "Enter your monthly budget in PKR:",
+      Kharcha.translate("budgetPrompt"),
       current || ""
     );
 
@@ -692,7 +622,7 @@
     const amount = Number(answer);
 
     if (!Number.isFinite(amount) || amount < 0) {
-      alert("Please enter a valid budget amount.");
+      alert(Kharcha.translate("invalidBudget"));
       return;
     }
 
@@ -702,16 +632,15 @@
 
   $("languageSelect").addEventListener("change", event => {
     Kharcha.setLanguage(event.target.value);
-    document.documentElement.lang =
-      event.target.value === "ur" ? "ur" : "en";
-    document.documentElement.dir =
-      event.target.value === "ur" ? "rtl" : "ltr";
+    renderDashboard();
   });
 
   function initializeDashboard() {
     $("monthSelect").value = Kharcha.getCurrentMonth();
     $("expenseDate").value = new Date().toISOString().slice(0, 10);
     $("languageSelect").value = Kharcha.getLanguage();
+
+    Kharcha.applyTranslations();
     renderDashboard();
   }
 
