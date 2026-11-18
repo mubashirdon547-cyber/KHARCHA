@@ -358,8 +358,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const currencyKey = "kharcha_currency";
 
   function getSavedCurrency() {
-    return localStorage.getItem(currencyKey) || "PKR";
-  }
+  return K.getCurrency();
+}
 
   function showStatus(key) {
     status.textContent = K.translate(key);
