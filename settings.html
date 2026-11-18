@@ -10,6 +10,26 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* Settings page layout */
+    .app-layout {
+      display: flex;
+      align-items: stretch;
+      min-height: 100vh;
+    }
+
+    .app-layout > .main-content {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      align-self: stretch;
+      margin-top: 0;
+      padding-top: 30px;
+    }
+
+    .main-content > .topbar {
+      margin-top: 0;
+    }
+
     .settings-container {
       display: flex;
       flex-direction: column;
@@ -119,6 +139,17 @@
       border-color: rgba(251,113,133,.3);
     }
 
+    .settings-muted {
+      color: var(--muted-text, #94a3b8);
+      font-size: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .app-layout > .main-content {
+        padding: 20px 16px;
+      }
+    }
+
     @media (max-width: 600px) {
       .settings-card {
         padding: 17px;
@@ -143,16 +174,16 @@
 </head>
 
 <body>
-<div class="app-shell">
+<div class="app-layout">
 
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-logo">K</div>
-      <span>Kharcha</span>
+      <span class="brand-name">Kharcha</span>
     </div>
 
-    <div class="sidebar-section">
-      <p class="sidebar-label" data-i18n="workspace">WORKSPACE</p>
+    <div class="nav-section">
+      <p class="nav-label" data-i18n="workspace">WORKSPACE</p>
 
       <a href="index.html" class="nav-link">
         <span>⌂</span>
@@ -180,8 +211,8 @@
       </a>
     </div>
 
-    <div class="sidebar-section">
-      <p class="sidebar-label" data-i18n="preferences">PREFERENCES</p>
+    <div class="nav-section">
+      <p class="nav-label" data-i18n="preferences">PREFERENCES</p>
 
       <a href="settings.html" class="nav-link active">
         <span>⚙</span>
@@ -218,7 +249,7 @@
 
       <div class="settings-container">
 
-        <!-- Language -->
+        <!-- Language Settings -->
         <div class="settings-card">
           <h3 data-i18n="languageSettings">Language</h3>
           <p class="settings-description" data-i18n="languageSettingsDescription">
@@ -241,7 +272,7 @@
           </div>
         </div>
 
-        <!-- Currency -->
+        <!-- Currency Settings -->
         <div class="settings-card">
           <h3 data-i18n="currencySettings">Currency</h3>
           <p class="settings-description" data-i18n="currencySettingsDescription">
@@ -271,7 +302,7 @@
           </div>
         </div>
 
-        <!-- Data management -->
+        <!-- Data Management -->
         <div class="settings-card">
           <h3 data-i18n="dataManagement">Data Management</h3>
           <p class="settings-description" data-i18n="dataManagementDescription">
@@ -286,7 +317,7 @@
               </span>
             </div>
 
-            <button class="settings-button" id="exportDataButton"
+            <button type="button" class="settings-button" id="exportDataButton"
               data-i18n="exportDataButton">
               Export Data
             </button>
@@ -300,7 +331,7 @@
               </span>
             </div>
 
-            <button class="settings-button danger" id="resetDataButton"
+            <button type="button" class="settings-button danger" id="resetDataButton"
               data-i18n="resetDataButton">
               Reset Data
             </button>
@@ -314,7 +345,7 @@
             role="status" aria-live="polite"></div>
         </div>
 
-        <!-- About -->
+        <!-- About Kharcha -->
         <div class="settings-card">
           <h3 data-i18n="aboutKharcha">About Kharcha</h3>
           <p class="settings-description" data-i18n="aboutKharchaDescription">
@@ -326,7 +357,8 @@
               <strong>Kharcha</strong>
               <span data-i18n="versionNumber">Version 1.0</span>
             </div>
-            <span class="report-muted">Personal Finance</span>
+
+            <span class="settings-muted">Personal Finance</span>
           </div>
 
           <div class="settings-note" data-i18n="privacyNote">
@@ -358,8 +390,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const currencyKey = "kharcha_currency";
 
   function getSavedCurrency() {
-  return K.getCurrency();
-}
+    return localStorage.getItem(currencyKey) || "PKR";
+  }
 
   function showStatus(key) {
     status.textContent = K.translate(key);
@@ -386,25 +418,31 @@ document.addEventListener("DOMContentLoaded", () => {
     updateLanguage(settingsLanguage.value);
   });
 
- currencySelect.addEventListener("change", () => {
-  K.setCurrency(currencySelect.value);
-  showStatus("currencySaved");
-});
+  currencySelect.addEventListener("change", () => {
+    localStorage.setItem(currencyKey, currencySelect.value);
+    showStatus("currencySaved");
+  });
 
+  // Export application data
   document.getElementById("exportDataButton")
     .addEventListener("click", () => {
+
       const backup = {
         application: "Kharcha",
         exportedAt: new Date().toISOString(),
+
         expenses: JSON.parse(
           localStorage.getItem("kharcha_expenses") || "[]"
         ),
+
         budget: JSON.parse(
           localStorage.getItem("kharcha_budget") || "0"
         ),
+
         budgets: JSON.parse(
           localStorage.getItem("kharcha_budgets") || "{}"
         ),
+
         language: localStorage.getItem("kharcha_language") || "en",
         currency: getSavedCurrency()
       };
@@ -430,8 +468,10 @@ document.addEventListener("DOMContentLoaded", () => {
       showStatus("exportSuccess");
     });
 
+  // Reset application data
   document.getElementById("resetDataButton")
     .addEventListener("click", () => {
+
       const confirmed = window.confirm(
         K.translate("confirmReset")
       );
