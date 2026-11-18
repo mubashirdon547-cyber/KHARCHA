@@ -1,0 +1,612 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d18">
+  <meta name="description" content="Set monthly budgets and monitor your spending with Kharcha.">
+  <title>Budgets | Kharcha</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .budget-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .budget-summary .card {
+      padding: 20px;
+    }
+
+    .budget-summary .stat-value {
+      font-size: 23px;
+      margin-top: 10px;
+      overflow-wrap: anywhere;
+    }
+
+    .budget-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .budget-form .form-group {
+      margin-bottom: 16px;
+    }
+
+    .budget-form button {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .budget-progress {
+      margin: 22px 0;
+    }
+
+    .budget-progress-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .budget-progress-heading strong {
+      font-family: 'Manrope', sans-serif;
+    }
+
+    .budget-progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 20px;
+      background: var(--border);
+      overflow: hidden;
+    }
+
+    .budget-progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: var(--blue);
+      transition: width .3s ease;
+    }
+
+    .budget-progress-fill.warning {
+      background: #f59e0b;
+    }
+
+    .budget-progress-fill.danger {
+      background: #ef4444;
+    }
+
+    .budget-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .budget-detail {
+      padding: 14px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .budget-detail span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 7px;
+    }
+
+    .budget-detail strong {
+      font-size: 17px;
+      font-family: 'Manrope', sans-serif;
+      overflow-wrap: anywhere;
+    }
+
+    .budget-history {
+      overflow-x: auto;
+    }
+
+    .budget-history table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 550px;
+    }
+
+    .budget-history th,
+    .budget-history td {
+      padding: 15px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .budget-history th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .budget-status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      background: rgba(16,185,129,.12);
+      color: #34d399;
+    }
+
+    .budget-status.warning {
+      background: rgba(245,158,11,.12);
+      color: #fbbf24;
+    }
+
+    .budget-status.danger {
+      background: rgba(239,68,68,.12);
+      color: #f87171;
+    }
+
+    .budget-empty {
+      padding: 30px 15px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .budget-message {
+      min-height: 20px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--green);
+    }
+
+    [dir="rtl"] .budget-history th,
+    [dir="rtl"] .budget-history td {
+      text-align: right;
+    }
+
+    [dir="rtl"] .budget-progress-heading {
+      direction: rtl;
+    }
+
+    @media(max-width: 850px) {
+      .budget-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width: 700px) {
+      .budget-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .budget-details {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <a href="index.html" class="brand">
+      <div class="brand-logo">₹</div>
+      <div class="brand-name">Khar<span>cha</span></div>
+    </a>
+
+    <div class="nav-section">
+      <div class="nav-label" data-i18n="workspace">Workspace</div>
+
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">⌂</span>
+        <span data-i18n="dashboard">Dashboard</span>
+      </a>
+
+      <a href="expenses.html" class="nav-link">
+        <span class="nav-icon">↗</span>
+        <span data-i18n="expenses">Expenses</span>
+      </a>
+
+      <a href="budgets.html" class="nav-link active">
+        <span class="nav-icon">◫</span>
+        <span data-i18n="budgets">Budgets</span>
+      </a>
+
+      <a href="analytics.html" class="nav-link">
+        <span class="nav-icon">▥</span>
+        <span data-i18n="analytics">Analytics</span>
+      </a>
+
+      <a href="reports.html" class="nav-link">
+        <span class="nav-icon">▤</span>
+        <span data-i18n="reports">Reports</span>
+      </a>
+    </div>
+
+    <div class="nav-section sidebar-bottom">
+      <div class="nav-label" data-i18n="preferences">Preferences</div>
+
+      <a href="settings.html" class="nav-link">
+        <span class="nav-icon">⚙</span>
+        <span data-i18n="settings">Settings</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <header class="topbar">
+
+      <div class="page-heading">
+        <h1 data-i18n="budgets">Budgets</h1>
+        <p data-i18n="budgetsSubtitle">
+          Plan your spending and stay within your limits.
+        </p>
+      </div>
+
+      <div class="topbar-actions">
+
+        <select id="languageSelect" class="language-select"
+          aria-label="Choose language">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="roman">Roman Urdu</option>
+        </select>
+
+      </div>
+
+    </header>
+
+    <!-- SUMMARY CARDS -->
+    <section class="budget-summary">
+
+      <div class="card stat-card balance">
+        <div class="stat-label" data-i18n="monthlyBudget">Monthly Budget</div>
+        <div class="stat-value" id="budgetTotal">PKR 0</div>
+        <div class="stat-note" data-i18n="selectedMonthBudget">
+          Budget for selected month
+        </div>
+      </div>
+
+      <div class="card stat-card expense">
+        <div class="stat-label" data-i18n="totalSpent">Total Spent</div>
+        <div class="stat-value" id="spentTotal">PKR 0</div>
+        <div class="stat-note" data-i18n="selectedMonthSpending">
+          Spending for selected month
+        </div>
+      </div>
+
+      <div class="card stat-card income">
+        <div class="stat-label" data-i18n="remaining">Remaining</div>
+        <div class="stat-value" id="remainingTotal">PKR 0</div>
+        <div class="stat-note" data-i18n="availableBudget">
+          Available budget
+        </div>
+      </div>
+
+    </section>
+
+    <!-- BUDGET CONTENT -->
+    <section class="budget-layout">
+
+      <!-- CURRENT BUDGET -->
+      <div class="card">
+
+        <h2 data-i18n="budgetOverview">Budget Overview</h2>
+
+        <p class="card-description" data-i18n="budgetOverviewDescription">
+          See how your spending compares with your budget.
+        </p>
+
+        <div class="budget-progress">
+
+          <div class="budget-progress-heading">
+            <span data-i18n="budgetUsed">Budget Used</span>
+            <strong id="budgetPercentage">0%</strong>
+          </div>
+
+          <div class="budget-progress-track">
+            <div class="budget-progress-fill" id="budgetProgress"></div>
+          </div>
+
+        </div>
+
+        <div id="budgetStatusMessage" class="notice warning"></div>
+
+        <div class="budget-details">
+
+          <div class="budget-detail">
+            <span data-i18n="spent">Spent</span>
+            <strong id="spentDetail">PKR 0</strong>
+          </div>
+
+          <div class="budget-detail">
+            <span data-i18n="limit">Budget Limit</span>
+            <strong id="limitDetail">PKR 0</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- SET BUDGET -->
+      <div class="card">
+
+        <h2 data-i18n="manageBudget">Manage Budget</h2>
+
+        <p class="card-description" data-i18n="manageBudgetDescription">
+          Set or update your budget for any month.
+        </p>
+
+        <form id="budgetForm" class="budget-form">
+
+          <div class="form-group">
+            <label for="budgetMonth" data-i18n="selectMonth">
+              Select Month
+            </label>
+            <input type="month" id="budgetMonth" required>
+          </div>
+
+          <div class="form-group">
+            <label for="budgetAmount" data-i18n="budgetAmount">
+              Budget Amount (PKR)
+            </label>
+            <input type="number" id="budgetAmount"
+              min="0" step="0.01" placeholder="30000" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary"
+            data-i18n="saveBudget">
+            Save Budget
+          </button>
+
+          <p id="budgetMessage" class="budget-message"
+            aria-live="polite"></p>
+
+        </form>
+
+      </div>
+
+    </section>
+
+    <!-- BUDGET HISTORY -->
+    <section class="card">
+
+      <div class="section-heading">
+        <div>
+          <h2 data-i18n="budgetHistory">Budget History</h2>
+
+          <p class="card-description" data-i18n="budgetHistoryDescription">
+            Review your monthly budgets and spending.
+          </p>
+        </div>
+      </div>
+
+      <div class="budget-history">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th data-i18n="month">Month</th>
+              <th data-i18n="budgetAmount">Budget</th>
+              <th data-i18n="totalSpent">Spent</th>
+              <th data-i18n="remaining">Remaining</th>
+              <th data-i18n="status">Status</th>
+            </tr>
+          </thead>
+
+          <tbody id="budgetHistoryBody"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <footer class="app-footer">
+      Kharcha © 2026 | Created by Mubashir Malik. All rights reserved.
+    </footer>
+
+  </main>
+
+</div>
+
+<script src="app.js"></script>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function money(amount) {
+    return Kharcha.formatCurrency(amount);
+  }
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[character]);
+  }
+
+  function translate(key) {
+    return Kharcha.translate(key);
+  }
+
+  function getMonthName(month) {
+    const [year, monthNumber] = month.split("-");
+    const date = new Date(Number(year), Number(monthNumber) - 1, 1);
+
+    return date.toLocaleDateString(
+      Kharcha.getLanguage() === "ur" ? "ur-PK" :
+      Kharcha.getLanguage() === "roman" ? "en-GB" : "en-US",
+      { month: "long", year: "numeric" }
+    );
+  }
+
+  function renderBudgetOverview() {
+    const month = $("budgetMonth").value;
+    const summary = Kharcha.getMonthlySummary(month);
+
+    $("budgetTotal").textContent = money(summary.budget);
+    $("spentTotal").textContent = money(summary.spent);
+    $("remainingTotal").textContent = money(summary.remaining);
+
+    $("spentDetail").textContent = money(summary.spent);
+    $("limitDetail").textContent = money(summary.budget);
+
+    const percentage = summary.budget > 0
+      ? Math.round(summary.percentage)
+      : 0;
+
+    $("budgetPercentage").textContent = percentage + "%";
+
+    const progress = $("budgetProgress");
+
+    progress.style.width = Math.min(percentage, 100) + "%";
+    progress.className = "budget-progress-fill";
+
+    if (percentage >= 100) {
+      progress.classList.add("danger");
+    } else if (percentage >= 80) {
+      progress.classList.add("warning");
+    }
+
+    const message = $("budgetStatusMessage");
+
+    if (summary.budget === 0) {
+      message.textContent = translate("setBudgetMessage");
+      message.className = "notice warning";
+    } else if (percentage >= 100) {
+      message.textContent = translate("exceededMessage");
+      message.className = "notice danger";
+    } else if (percentage >= 80) {
+      message.textContent = translate("warningMessage");
+      message.className = "notice warning";
+    } else {
+      message.textContent = translate("withinBudgetMessage");
+      message.className = "notice";
+    }
+
+    if (summary.budget > 0) {
+      $("budgetAmount").value = summary.budget;
+    } else {
+      $("budgetAmount").value = "";
+    }
+  }
+
+  function renderBudgetHistory() {
+    const budgets = Kharcha.getBudgets();
+    const body = $("budgetHistoryBody");
+
+    const months = Object.keys(budgets)
+      .sort((a, b) => b.localeCompare(a));
+
+    if (!months.length) {
+      body.innerHTML = `
+        <tr>
+          <td colspan="5" class="budget-empty">
+            ${escapeHTML(translate("noBudgetHistory"))}
+          </td>
+        </tr>`;
+      return;
+    }
+
+    body.innerHTML = months.map(month => {
+      const summary = Kharcha.getMonthlySummary(month);
+
+      let status = translate("withinBudget");
+      let statusClass = "";
+
+      if (summary.spent > summary.budget) {
+        status = translate("overBudget");
+        statusClass = "danger";
+      } else if (summary.percentage >= 80) {
+        status = translate("nearLimit");
+        statusClass = "warning";
+      }
+
+      return `
+        <tr>
+          <td>${escapeHTML(getMonthName(month))}</td>
+          <td>${money(summary.budget)}</td>
+          <td>${money(summary.spent)}</td>
+          <td>${money(summary.remaining)}</td>
+          <td>
+            <span class="budget-status ${statusClass}">
+              ${escapeHTML(status)}
+            </span>
+          </td>
+        </tr>`;
+    }).join("");
+  }
+
+  $("budgetMonth").addEventListener("change", () => {
+    renderBudgetOverview();
+  });
+
+  $("budgetForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    const month = $("budgetMonth").value;
+    const amount = Number($("budgetAmount").value);
+
+    if (!month || !Number.isFinite(amount) || amount < 0) {
+      $("budgetMessage").textContent = translate("invalidBudget");
+      return;
+    }
+
+    try {
+      Kharcha.setMonthlyBudget(amount, month);
+
+      $("budgetMessage").textContent = translate("budgetSaved");
+
+      renderBudgetOverview();
+      renderBudgetHistory();
+
+    } catch (error) {
+      $("budgetMessage").textContent = error.message;
+    }
+  });
+
+  $("languageSelect").addEventListener("change", event => {
+    Kharcha.setLanguage(event.target.value);
+
+    Kharcha.applyTranslations();
+
+    renderBudgetOverview();
+    renderBudgetHistory();
+  });
+
+  function initializeBudgets() {
+    $("languageSelect").value = Kharcha.getLanguage();
+    $("budgetMonth").value = Kharcha.getCurrentMonth();
+
+    Kharcha.applyTranslations();
+
+    renderBudgetOverview();
+    renderBudgetHistory();
+  }
+
+  initializeBudgets();
+</script>
+
+</body>
+</html>
