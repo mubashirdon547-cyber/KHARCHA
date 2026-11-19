@@ -1,4 +1,3 @@
-
 /* =========================================================
    KHARCHA — SHARED APPLICATION ENGINE
    Languages: English, Urdu, Roman Urdu
@@ -602,8 +601,40 @@
     return Array.isArray(expenses) ? expenses : [];
   }
 
+  function notifyDataChanged(detail = {}) {
+    // Notify every open Kharcha page in this browser tab.
+    window.dispatchEvent(new CustomEvent("kharcha:dataChanged", {
+      detail: {
+        type: "data",
+        ...detail
+      }
+    }));
+  }
+
   function saveExpenses(expenses) {
-    return writeStorage(STORAGE.expenses, expenses);
+    const saved = writeStorage(STORAGE.expenses, expenses);
+
+    if (saved) {
+      notifyDataChanged({ type: "expenses" });
+    }
+
+    return saved;
+  }
+
+  function onDataChange(callback) {
+    if (typeof callback !== "function") {
+      return function () {};
+    }
+
+    const handleChange = event => callback(event);
+
+    window.addEventListener("kharcha:dataChanged", handleChange);
+    window.addEventListener("storage", handleChange);
+
+    return function unsubscribe() {
+      window.removeEventListener("kharcha:dataChanged", handleChange);
+      window.removeEventListener("storage", handleChange);
+    };
   }
 
   /* =========================================================
@@ -698,6 +729,7 @@
 
     try {
       localStorage.setItem(STORAGE.currency, currency);
+      notifyDataChanged({ type: "currency", currency });
       return true;
     } catch (error) {
       console.error("Unable to save currency:", error);
@@ -809,6 +841,25 @@
     );
   }
 
+  function deleteMonthExpenses(month) {
+    const selectedMonth = month || getCurrentMonth();
+
+    if (!/^\d{4}-\d{2}$/.test(selectedMonth)) {
+      return false;
+    }
+
+    const expenses = getExpenses();
+    const updated = expenses.filter(expense =>
+      String(expense.date || "").slice(0, 7) !== selectedMonth
+    );
+
+    if (updated.length === expenses.length) {
+      return 0;
+    }
+
+    return saveExpenses(updated) ? expenses.length - updated.length : false;
+  }
+
   /* =========================================================
      6. BUDGET MANAGEMENT
   ========================================================= */
@@ -860,6 +911,10 @@
 
     if (saved && selectedMonth === getCurrentMonth()) {
       writeStorage(STORAGE.budget, value);
+    }
+
+    if (saved) {
+      notifyDataChanged({ type: "budgets", month: selectedMonth });
     }
 
     return saved;
@@ -922,6 +977,8 @@
     deleteExpense,
     updateExpense,
     getMonthExpenses,
+    deleteMonthExpenses,
+    onDataChange,
 
     // Budgets
     getBudgets,
@@ -976,6 +1033,4 @@
   }
 
 })();
-
-
 
