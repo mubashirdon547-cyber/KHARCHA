@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +9,6 @@
   <title>Reports | Kharcha</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- Free PDF generation library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -422,9 +422,8 @@
   </main>
 </div>
 
-<!-- Hidden, professionally formatted PDF report -->
 <div id="pdfReport" style="
-  position:fixed;
+  position:absolute;
   left:-10000px;
   top:0;
   width:760px;
@@ -442,7 +441,6 @@
   </div>
 
   <h2 style="font-size:18px;color:#14213d;">Financial Summary</h2>
-
   <div id="pdfSummary" style="margin-bottom:25px;"></div>
 
   <h2 style="font-size:18px;color:#14213d;margin-top:25px;">Budget Performance</h2>
@@ -519,11 +517,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getExpenses(month) {
-    return K.getExpenses()
+    const allExpenses = K.getExpenses();
+
+    if (!Array.isArray(allExpenses)) {
+      return [];
+    }
+
+    return allExpenses
       .filter(expense =>
         String(expense.date || "").slice(0, 7) === month
       )
-      .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      .sort((a, b) =>
+        String(b.date || "").localeCompare(String(a.date || ""))
+      );
   }
 
   function getCategoryName(category) {
@@ -649,25 +655,29 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
-  /* FIX 1: CSV DOWNLOAD */
+  /* CSV DOWNLOAD */
   function downloadCSV() {
     const data = getReportData();
 
     const rows = [
-      ["Kharcha Monthly Report"],
+      ["KHARCHA MONTHLY REPORT"],
       ["Month", data.month],
       ["Total Spent", data.spent],
       ["Monthly Budget", data.budget],
       ["Remaining", data.remaining],
+      ["Transactions", data.expenses.length],
       [],
-      ["Date", "Description", "Category", "Amount"],
-      ...data.expenses.map(expense => [
+      ["Date", "Description", "Category", "Amount"]
+    ];
+
+    data.expenses.forEach(expense => {
+      rows.push([
         expense.date || "",
         expense.description || "",
         getCategoryName(expense.category || "other"),
         Number(expense.amount || 0)
-      ])
-    ];
+      ]);
+    });
 
     const csv = rows.map(row =>
       row.map(value =>
@@ -675,21 +685,23 @@ document.addEventListener("DOMContentLoaded", () => {
       ).join(",")
     ).join("\r\n");
 
-    const blob = new Blob(["\uFEFF" + csv], {
-      type: "text/csv;charset=utf-8;"
-    });
+    const blob = new Blob(
+      ["\uFEFF" + csv],
+      { type: "text/csv;charset=utf-8;" }
+    );
 
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
+    link.style.display = "none";
     link.href = url;
-    link.download = "Kharcha-Report-" + data.month + ".csv";
+    link.download = `Kharcha-Report-${data.month}.csv`;
 
     document.body.appendChild(link);
     link.click();
     link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
   }
 
   function preparePDF(data) {
@@ -708,7 +720,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <tr>
           ${summaryItems.slice(0, 2).map(item => `
             <td style="padding:15px;background:#f1f5fb;border-radius:8px;width:50%;">
-              <div style="font-size:11px;color:#64748b;">${item[0]}</div>
+              <div style="font-size:11px;color:#64748b;">${escapeHTML(item[0])}</div>
               <div style="font-size:19px;font-weight:bold;margin-top:7px;">${escapeHTML(item[1])}</div>
             </td>
           `).join("")}
@@ -716,7 +728,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <tr>
           ${summaryItems.slice(2, 4).map(item => `
             <td style="padding:15px;background:#f1f5fb;border-radius:8px;width:50%;">
-              <div style="font-size:11px;color:#64748b;">${item[0]}</div>
+              <div style="font-size:11px;color:#64748b;">${escapeHTML(item[0])}</div>
               <div style="font-size:19px;font-weight:bold;margin-top:7px;">${escapeHTML(item[1])}</div>
             </td>
           `).join("")}
@@ -785,13 +797,13 @@ document.addEventListener("DOMContentLoaded", () => {
           `;
   }
 
-  /* FIX 2: PDF DOWNLOAD */
+  /* PDF DOWNLOAD */
   async function downloadPDF() {
     const button = document.getElementById("downloadPDF");
     let exportElement = null;
 
     if (!window.html2pdf) {
-      alert("PDF library could not load. Please refresh the page and try again.");
+      alert("PDF library could not load. Please refresh and try again.");
       return;
     }
 
@@ -800,52 +812,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const data = getReportData();
+
       preparePDF(data);
 
-      // Create a temporary copy for PDF generation.
-      // The original hidden PDF template remains unchanged.
-      exportElement = document.getElementById("pdfReport").cloneNode(true);
+      exportElement = document
+        .getElementById("pdfReport")
+        .cloneNode(true);
 
       exportElement.id = "pdfReportExport";
-      exportElement.style.position = "fixed";
-      exportElement.style.left = "0";
-      exportElement.style.top = "0";
-      exportElement.style.width = "760px";
-      exportElement.style.display = "block";
-      exportElement.style.visibility = "visible";
-      exportElement.style.zIndex = "2147483647";
-      exportElement.style.background = "#ffffff";
+
+      Object.assign(exportElement.style, {
+        position: "absolute",
+        left: "0",
+        top: "0",
+        width: "760px",
+        display: "block",
+        visibility: "visible",
+        opacity: "1",
+        zIndex: "999999",
+        background: "#ffffff",
+        color: "#172033",
+        height: "auto",
+        maxHeight: "none",
+        overflow: "visible",
+        transform: "none"
+      });
 
       document.body.appendChild(exportElement);
 
-      await html2pdf().set({
-        margin: [10, 10, 12, 10],
-        filename: "Kharcha-Report-" + data.month + ".pdf",
-        image: {
-          type: "jpeg",
-          quality: 0.98
-        },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          scrollX: 0,
-          scrollY: 0,
-          windowWidth: 900
-        },
-        jsPDF: {
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait"
-        },
-        pagebreak: {
-          mode: ["css", "legacy"]
-        }
-      }).from(exportElement).save();
+      await new Promise(resolve => requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      }));
+
+      await html2pdf()
+        .set({
+          margin: [10, 10, 12, 10],
+          filename: `Kharcha-Report-${data.month}.pdf`,
+          image: {
+            type: "jpeg",
+            quality: 0.98
+          },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: 900
+          },
+          jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait"
+          },
+          pagebreak: {
+            mode: ["css", "legacy"]
+          }
+        })
+        .from(exportElement)
+        .save();
 
     } catch (error) {
       console.error("PDF generation error:", error);
-      alert("PDF generation failed. Please refresh and try again.");
+      alert("PDF generation failed. Please try again.");
     } finally {
       if (exportElement) {
         exportElement.remove();
@@ -864,8 +894,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   K.applyTranslations();
   renderReport();
+
+  if (typeof K.onDataChange === "function") {
+    K.onDataChange(renderReport);
+  }
 });
 </script>
 
 </body>
 </html>
+
