@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,6 +85,44 @@
 
     .delete-btn:hover {
       background: rgba(239,68,68,.2);
+    }
+
+    .section-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .reset-month-btn {
+      border: 1px solid rgba(239,68,68,.35);
+      background: rgba(239,68,68,.10);
+      color: #f87171;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background .2s ease;
+    }
+
+    .reset-month-btn:hover {
+      background: rgba(239,68,68,.20);
+    }
+
+    .reset-month-btn:focus-visible {
+      outline: 2px solid #f87171;
+      outline-offset: 3px;
+    }
+
+    @media(max-width: 700px) {
+      .section-actions {
+        width: 100%;
+      }
+
+      .section-actions button {
+        flex: 1;
+      }
     }
 
     .expense-modal {
@@ -298,9 +335,15 @@
           </p>
         </div>
 
-        <button class="btn btn-primary" id="openExpenseModal">
-          + <span data-i18n="addExpense">Add Expense</span>
-        </button>
+        <div class="section-actions">
+          <button class="btn btn-primary" id="openExpenseModal">
+            + <span data-i18n="addExpense">Add Expense</span>
+          </button>
+
+          <button type="button" class="reset-month-btn" id="resetMonthButton">
+            Reset Selected Month
+          </button>
+        </div>
 
       </div>
 
@@ -446,6 +489,60 @@
     return Kharcha.translate(key);
   }
 
+  function getResetMessages() {
+    const language = Kharcha.getLanguage();
+
+    const messages = {
+      en: {
+        button: "Reset Selected Month",
+        confirm: "This will permanently delete every expense in the selected month. Your monthly budget and expenses from other months will remain unchanged. Continue?",
+        empty: "There are no expenses to reset for this month.",
+        success: "Expenses for the selected month have been reset."
+      },
+      ur: {
+        button: "منتخب مہینے کے اخراجات ری سیٹ کریں",
+        confirm: "منتخب مہینے کے تمام اخراجات مستقل طور پر حذف ہو جائیں گے۔ آپ کا ماہانہ بجٹ اور دوسرے مہینوں کے اخراجات محفوظ رہیں گے۔ کیا آپ جاری رکھنا چاہتے ہیں؟",
+        empty: "اس مہینے میں ری سیٹ کرنے کے لیے کوئی اخراجات نہیں ہیں۔",
+        success: "منتخب مہینے کے اخراجات ری سیٹ کر دیے گئے ہیں۔"
+      },
+      roman: {
+        button: "Selected Mahine ke Kharchay Reset Karein",
+        confirm: "Selected mahine ke tamam kharchay hamesha ke liye delete ho jayenge. Aapka monthly budget aur doosre mahino ke kharchay mehfooz rahenge. Kya aap jari rakhna chahte hain?",
+        empty: "Is mahine mein reset karne ke liye koi kharchay nahi hain.",
+        success: "Selected mahine ke kharchay reset kar diye gaye hain."
+      }
+    };
+
+    return messages[language] || messages.en;
+  }
+
+  function updateResetButtonLabel() {
+    $("resetMonthButton").textContent = getResetMessages().button;
+  }
+
+  function resetSelectedMonth() {
+    const month = $("filterMonth").value || Kharcha.getCurrentMonth();
+    const messages = getResetMessages();
+
+    const expensesToDelete = Kharcha.getExpenses().filter(item =>
+      String(item.date).startsWith(month)
+    );
+
+    if (!expensesToDelete.length) {
+      alert(messages.empty);
+      return;
+    }
+
+    if (!confirm(messages.confirm)) return;
+
+    expensesToDelete.forEach(item => {
+      Kharcha.deleteExpense(item.id);
+    });
+
+    renderExpenses();
+    alert(messages.success);
+  }
+
   function renderExpenses() {
     const month = $("filterMonth").value;
     const category = $("filterCategory").value;
@@ -532,6 +629,8 @@
 
   $("openExpenseModal").addEventListener("click", openModal);
 
+  $("resetMonthButton").addEventListener("click", resetSelectedMonth);
+
   $("closeExpenseModal").addEventListener("click", closeModal);
 
   $("expenseModal").addEventListener("click", event => {
@@ -578,6 +677,7 @@
 
   $("languageSelect").addEventListener("change", event => {
     Kharcha.setLanguage(event.target.value);
+    updateResetButtonLabel();
     renderExpenses();
   });
 
@@ -586,6 +686,7 @@
     $("filterMonth").value = Kharcha.getCurrentMonth();
 
     Kharcha.applyTranslations();
+    updateResetButtonLabel();
     renderExpenses();
   }
 
