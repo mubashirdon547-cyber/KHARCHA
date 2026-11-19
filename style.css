@@ -2,22 +2,22 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --bg: #0A0A0A;
-  --surface: #141414;
-  --surface-2: #1B1B1B;
-  --surface-3: #242424;
-  --border: #2A2A2A;
-  --text: #F5F5F5;
-  --muted: #999999;
+  --bg: #080d18;
+  --surface: #101827;
+  --surface-2: #151f31;
+  --surface-3: #1b2940;
+  --border: #243149;
+  --text: #f3f6fc;
+  --muted: #8d9bb1;
 
-  --blue: #F59E0B;
-  --blue-light: #FBBF24;
-  --green: #27C995;
-  --red: #FF647C;
-  --yellow: #F59E0B;
+  --blue: #3985ff;
+  --blue-light: #64a3ff;
+  --green: #27c995;
+  --red: #ff647c;
+  --yellow: #f6bd4b;
 
   --radius: 18px;
-  --shadow: 0 12px 35px rgba(0,0,0,.22);
+  --shadow: 0 12px 35px rgba(0,0,0,.18);
 }
 
 * {
@@ -61,7 +61,7 @@ img {
   max-width: 100%;
 }
 
-/* Main application layout */
+/* APPLICATION LAYOUT */
 
 .app-layout {
   display: flex;
@@ -74,7 +74,7 @@ img {
 .sidebar {
   width: 250px;
   min-width: 250px;
-  background: #101010;
+  background: #0c1423;
   border-right: 1px solid var(--border);
   padding: 28px 18px;
   display: flex;
@@ -92,20 +92,22 @@ img {
 .brand-logo {
   width: 42px;
   height: 42px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #FBBF24, #D97706);
+  background: linear-gradient(135deg, var(--blue-light), var(--blue));
   border-radius: 13px;
-  color: #111111;
+  color: white;
   font-size: 21px;
   font-weight: 800;
-  box-shadow: 0 5px 18px rgba(245,158,11,.15);
+  box-shadow: 0 5px 18px rgba(57,133,255,.2);
+  overflow: hidden;
 }
 
 .brand-logo img {
-  width: 65px;
-  height: 65px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }
@@ -130,7 +132,7 @@ img {
 .nav-label {
   padding: 0 12px;
   margin-bottom: 7px;
-  color: #777777;
+  color: #71819b;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -155,8 +157,9 @@ img {
 }
 
 .nav-link.active {
-  background: rgba(245,158,11,.12);
+  background: rgba(57,133,255,.13);
   color: var(--blue-light);
+  border: 1px solid rgba(57,133,255,.12);
 }
 
 .nav-icon {
@@ -169,7 +172,7 @@ img {
   margin-top: auto;
 }
 
-/* Main content */
+/* MAIN CONTENT */
 
 .main-content {
   flex: 1;
@@ -224,7 +227,7 @@ img {
   font-weight: 800;
 }
 
-/* Cards and dashboard */
+/* DASHBOARD CARDS */
 
 .stats-grid {
   display: grid;
@@ -239,6 +242,11 @@ img {
   border-radius: var(--radius);
   padding: 22px;
   box-shadow: var(--shadow);
+  transition: border-color .2s ease, transform .2s ease;
+}
+
+.card:hover {
+  border-color: #344766;
 }
 
 .stat-card {
@@ -254,7 +262,7 @@ img {
   border-radius: 50%;
   right: -45px;
   top: -45px;
-  background: rgba(245,158,11,.07);
+  background: rgba(57,133,255,.08);
   pointer-events: none;
 }
 
@@ -310,12 +318,12 @@ img {
   margin-bottom: 20px;
 }
 
-/* Budget progress */
+/* BUDGET PROGRESS */
 
 .progress-track {
   width: 100%;
   height: 10px;
-  background: #292929;
+  background: #243149;
   border-radius: 20px;
   overflow: hidden;
 }
@@ -323,13 +331,13 @@ img {
 .progress-fill {
   height: 100%;
   width: 0;
-  background: linear-gradient(90deg, #D97706, #FBBF24);
+  background: linear-gradient(90deg, #3985ff, #64a3ff);
   border-radius: inherit;
   transition: width .4s ease;
 }
 
 .progress-fill.danger {
-  background: linear-gradient(90deg, #FF526F, #FF8795);
+  background: linear-gradient(90deg, #ff526f, #ff8795);
 }
 
 .progress-details {
@@ -341,7 +349,7 @@ img {
   font-size: 12px;
 }
 
-/* Forms and controls */
+/* FORMS AND CONTROLS */
 
 .form-group {
   display: flex;
@@ -351,7 +359,7 @@ img {
 }
 
 .form-group label {
-  color: #D4D4D4;
+  color: #d4deed;
   font-size: 13px;
   font-weight: 600;
 }
@@ -363,7 +371,7 @@ textarea {
   width: 100%;
   min-height: 45px;
   padding: 11px 13px;
-  background: #101010;
+  background: #0c1423;
   border: 1px solid var(--border);
   border-radius: 11px;
   color: var(--text);
@@ -375,12 +383,12 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(245,158,11,.12);
+  box-shadow: 0 0 0 3px rgba(57,133,255,.13);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #777777;
+  color: #71819b;
 }
 
 select option {
@@ -394,7 +402,7 @@ select option {
   gap: 15px;
 }
 
-/* Buttons */
+/* BUTTONS */
 
 .btn {
   display: inline-flex;
@@ -411,23 +419,24 @@ select option {
 }
 
 .btn-primary {
-  background: var(--blue);
-  color: #111111;
+  background: linear-gradient(135deg, #3985ff, #2769d9);
+  color: white;
 }
 
 .btn-primary:hover {
-  background: #FBBF24;
+  background: linear-gradient(135deg, #64a3ff, #3985ff);
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(57,133,255,.2);
 }
 
 .btn-secondary {
   background: var(--surface-3);
-  color: #E5E5E5;
+  color: #e5edfa;
   border-color: var(--border);
 }
 
 .btn-secondary:hover {
-  background: #303030;
+  background: #243653;
 }
 
 .btn-danger {
@@ -444,7 +453,7 @@ select option {
   width: 100%;
 }
 
-/* Tables and transactions */
+/* TABLES AND TRANSACTIONS */
 
 .table-wrapper {
   width: 100%;
@@ -461,7 +470,7 @@ table {
 th {
   padding: 13px 14px;
   text-align: left;
-  color: #999999;
+  color: #8d9bb1;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: .7px;
@@ -471,8 +480,8 @@ th {
 
 td {
   padding: 15px 14px;
-  border-bottom: 1px solid rgba(42,42,42,.8);
-  color: #E5E5E5;
+  border-bottom: 1px solid rgba(36,49,73,.8);
+  color: #e5edfa;
   font-size: 13px;
 }
 
@@ -503,14 +512,14 @@ tbody tr:hover {
   font-weight: 700;
 }
 
-/* Category labels */
+/* CATEGORY LABELS */
 
 .badge {
   display: inline-flex;
   align-items: center;
   padding: 5px 9px;
   border-radius: 30px;
-  background: rgba(245,158,11,.12);
+  background: rgba(57,133,255,.12);
   color: var(--blue-light);
   font-size: 11px;
   font-weight: 700;
@@ -526,7 +535,7 @@ tbody tr:hover {
   color: var(--red);
 }
 
-/* Charts and category breakdown */
+/* CATEGORY BREAKDOWN */
 
 .category-list {
   display: flex;
@@ -548,7 +557,7 @@ tbody tr:hover {
 }
 
 .category-info span:first-child {
-  color: #E5E5E5;
+  color: #e5edfa;
   font-weight: 600;
 }
 
@@ -558,18 +567,18 @@ tbody tr:hover {
 
 .category-track {
   height: 7px;
-  background: #292929;
+  background: #243149;
   border-radius: 20px;
   overflow: hidden;
 }
 
 .category-fill {
   height: 100%;
-  background: linear-gradient(90deg, #D97706, #FBBF24);
+  background: linear-gradient(90deg, #3985ff, #64a3ff);
   border-radius: inherit;
 }
 
-/* Empty states */
+/* EMPTY STATES */
 
 .empty-state {
   padding: 35px 20px;
@@ -592,7 +601,7 @@ tbody tr:hover {
   font-size: 12px;
 }
 
-/* Filters and page tools */
+/* FILTERS */
 
 .filters {
   display: flex;
@@ -606,7 +615,7 @@ tbody tr:hover {
   max-width: 220px;
 }
 
-/* Settings */
+/* SETTINGS */
 
 .settings-group {
   margin-bottom: 22px;
@@ -635,14 +644,14 @@ tbody tr:hover {
   font-size: 12px;
 }
 
-/* Notices */
+/* NOTICES */
 
 .notice {
   padding: 14px 16px;
   border-radius: 12px;
-  background: rgba(245,158,11,.09);
-  border: 1px solid rgba(245,158,11,.2);
-  color: #FCD58A;
+  background: rgba(57,133,255,.09);
+  border: 1px solid rgba(57,133,255,.2);
+  color: #a9caff;
   font-size: 13px;
   margin-bottom: 18px;
 }
@@ -650,27 +659,27 @@ tbody tr:hover {
 .notice.warning {
   background: rgba(246,189,75,.09);
   border-color: rgba(246,189,75,.2);
-  color: #F6D58D;
+  color: #f6d58d;
 }
 
 .notice.danger {
   background: rgba(255,100,124,.09);
   border-color: rgba(255,100,124,.2);
-  color: #FF9AAA;
+  color: #ff9aaa;
 }
 
-/* Footer */
+/* FOOTER */
 
 .app-footer {
   margin-top: 45px;
   padding: 20px 0;
   border-top: 1px solid var(--border);
-  color: #777777;
+  color: #71819b;
   text-align: center;
   font-size: 11px;
 }
 
-/* General layout protection */
+/* LAYOUT PROTECTION */
 
 .main-content *,
 .card,
@@ -683,7 +692,7 @@ tbody tr:hover {
   max-width: 100%;
 }
 
-/* Responsive design */
+/* RESPONSIVE */
 
 @media (max-width: 1000px) {
   .sidebar {
@@ -786,8 +795,6 @@ tbody tr:hover {
   }
 }
 
-/* Smaller phones */
-
 @media screen and (max-width: 480px) {
   .main-content {
     padding: 16px 12px;
@@ -831,7 +838,7 @@ tbody tr:hover {
   }
 }
 
-/* Urdu right-to-left layout */
+/* URDU RTL */
 
 html[dir="rtl"] body {
   text-align: right;
