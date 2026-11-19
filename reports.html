@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="style.css">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     .app-layout {
@@ -422,6 +424,7 @@
   </main>
 </div>
 
+<!-- Old PDF template retained but no longer used by PDF download -->
 <div id="pdfReport" style="
   position:absolute;
   left:-10000px;
@@ -433,7 +436,6 @@
   font-family:Arial,sans-serif;
   box-sizing:border-box;
 ">
-
   <div style="border-bottom:3px solid #2563eb;padding-bottom:18px;margin-bottom:25px;">
     <div style="font-size:29px;font-weight:800;color:#14213d;">KHARCHA</div>
     <div style="font-size:12px;color:#64748b;margin-top:5px;">PERSONAL FINANCE REPORT</div>
@@ -655,7 +657,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
-  /* CSV DOWNLOAD */
+  /* CSV DOWNLOAD - PRESERVED */
   function downloadCSV() {
     const data = getReportData();
 
@@ -704,105 +706,11 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   }
 
-  function preparePDF(data) {
-    document.getElementById("pdfMonth").textContent =
-      "Monthly Report: " + data.month;
-
-    const summaryItems = [
-      ["Total Spent", money(data.spent)],
-      ["Monthly Budget", money(data.budget)],
-      ["Remaining", money(data.remaining)],
-      ["Transactions", String(data.expenses.length)]
-    ];
-
-    document.getElementById("pdfSummary").innerHTML = `
-      <table style="width:100%;border-collapse:separate;border-spacing:8px;">
-        <tr>
-          ${summaryItems.slice(0, 2).map(item => `
-            <td style="padding:15px;background:#f1f5fb;border-radius:8px;width:50%;">
-              <div style="font-size:11px;color:#64748b;">${escapeHTML(item[0])}</div>
-              <div style="font-size:19px;font-weight:bold;margin-top:7px;">${escapeHTML(item[1])}</div>
-            </td>
-          `).join("")}
-        </tr>
-        <tr>
-          ${summaryItems.slice(2, 4).map(item => `
-            <td style="padding:15px;background:#f1f5fb;border-radius:8px;width:50%;">
-              <div style="font-size:11px;color:#64748b;">${escapeHTML(item[0])}</div>
-              <div style="font-size:19px;font-weight:bold;margin-top:7px;">${escapeHTML(item[1])}</div>
-            </td>
-          `).join("")}
-        </tr>
-      </table>
-    `;
-
-    const status = data.budget <= 0
-      ? "No budget set"
-      : data.percentage > 100
-        ? "Over budget"
-        : data.percentage >= 80
-          ? "Near budget limit"
-          : "Within budget";
-
-    document.getElementById("pdfBudget").innerHTML = `
-      <div style="padding:16px;background:#f1f5fb;border-radius:8px;">
-        <div style="font-size:22px;font-weight:bold;color:#2563eb;">
-          ${data.budget > 0 ? data.percentage.toFixed(1) + "%" : "—"}
-        </div>
-        <div style="font-size:12px;color:#64748b;margin-top:5px;">
-          ${status}
-        </div>
-        <div style="height:9px;background:#dbe4f0;border-radius:10px;margin-top:12px;overflow:hidden;">
-          <div style="height:9px;width:${Math.min(data.percentage, 100)}%;background:#2563eb;"></div>
-        </div>
-      </div>
-    `;
-
-    const entries = Object.entries(data.categories)
-      .sort((a, b) => b[1] - a[1]);
-
-    document.getElementById("pdfCategories").innerHTML = entries.length
-      ? entries.map(([category, amount]) => {
-          const percentage = data.spent > 0
-            ? (amount / data.spent) * 100
-            : 0;
-
-          return `
-            <div style="padding:10px 0;border-bottom:1px solid #e2e8f0;">
-              <span>${escapeHTML(getCategoryName(category))}</span>
-              <strong style="float:right;">
-                ${escapeHTML(money(amount))} (${percentage.toFixed(1)}%)
-              </strong>
-            </div>
-          `;
-        }).join("")
-      : '<p style="color:#64748b;">No category spending recorded.</p>';
-
-    document.getElementById("pdfTransactions").innerHTML =
-      data.expenses.length
-        ? data.expenses.map(expense => `
-            <tr>
-              <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(expense.date || "—")}</td>
-              <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(expense.description || "—")}</td>
-              <td style="padding:9px;border:1px solid #dbe3ef;">${escapeHTML(getCategoryName(expense.category || "other"))}</td>
-              <td style="padding:9px;text-align:right;border:1px solid #dbe3ef;">${escapeHTML(money(expense.amount))}</td>
-            </tr>
-          `).join("")
-        : `
-            <tr>
-              <td colspan="4" style="padding:12px;border:1px solid #dbe3ef;">
-                No transactions found for this month.
-              </td>
-            </tr>
-          `;
-  }
-
-  /* PDF DOWNLOAD */
+  /* NEW DIRECT PDF DOWNLOAD */
   async function downloadPDF() {
     const button = document.getElementById("downloadPDF");
-    let exportElement = null;
 
-    if (!window.html2pdf) {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
       alert("PDF library could not load. Please refresh and try again.");
       return;
     }
@@ -812,75 +720,228 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const data = getReportData();
+      const { jsPDF } = window.jspdf;
 
-      preparePDF(data);
-
-      exportElement = document
-        .getElementById("pdfReport")
-        .cloneNode(true);
-
-      exportElement.id = "pdfReportExport";
-
-      Object.assign(exportElement.style, {
-        position: "absolute",
-        left: "0",
-        top: "0",
-        width: "760px",
-        display: "block",
-        visibility: "visible",
-        opacity: "1",
-        zIndex: "999999",
-        background: "#ffffff",
-        color: "#172033",
-        height: "auto",
-        maxHeight: "none",
-        overflow: "visible",
-        transform: "none"
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
       });
 
-      document.body.appendChild(exportElement);
+      if (typeof doc.autoTable !== "function") {
+        throw new Error("PDF table plugin could not load.");
+      }
 
-      await new Promise(resolve => requestAnimationFrame(() => {
-        requestAnimationFrame(resolve);
-      }));
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 14;
 
-      await html2pdf()
-        .set({
-          margin: [10, 10, 12, 10],
-          filename: `Kharcha-Report-${data.month}.pdf`,
-          image: {
-            type: "jpeg",
-            quality: 0.98
-          },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: "#ffffff",
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: 900
-          },
-          jsPDF: {
-            unit: "mm",
-            format: "a4",
-            orientation: "portrait"
-          },
-          pagebreak: {
-            mode: ["css", "legacy"]
-          }
-        })
-        .from(exportElement)
-        .save();
+      /* HEADER */
+      doc.setFillColor(20, 33, 61);
+      doc.rect(0, 0, pageWidth, 38, "F");
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(23);
+      doc.text("KHARCHA", margin, 17);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text("PERSONAL FINANCE REPORT", margin, 25);
+
+      doc.setFontSize(12);
+      doc.text("Monthly Report: " + data.month, margin, 33);
+
+      /* FINANCIAL SUMMARY */
+      doc.setTextColor(20, 33, 61);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.text("Financial Summary", margin, 50);
+
+      doc.autoTable({
+        startY: 55,
+        head: [["Metric", "Amount"]],
+        body: [
+          ["Total Spent", money(data.spent)],
+          ["Monthly Budget", money(data.budget)],
+          ["Remaining", money(data.remaining)],
+          ["Transactions", String(data.expenses.length)]
+        ],
+        theme: "grid",
+        margin: { left: margin, right: margin },
+        styles: {
+          font: "helvetica",
+          fontSize: 10,
+          cellPadding: 4
+        },
+        headStyles: {
+          fillColor: [37, 99, 235],
+          textColor: 255
+        }
+      });
+
+      /* BUDGET PERFORMANCE */
+      let nextY = doc.lastAutoTable.finalY + 12;
+
+      if (nextY > 255) {
+        doc.addPage();
+        nextY = 20;
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.setTextColor(20, 33, 61);
+      doc.text("Budget Performance", margin, nextY);
+
+      nextY += 8;
+
+      const status = data.budget <= 0
+        ? "No budget set"
+        : data.percentage > 100
+          ? "Over budget"
+          : data.percentage >= 80
+            ? "Near budget limit"
+            : "Within budget";
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+
+      doc.text(
+        "Budget Used: " +
+        (data.budget > 0 ? data.percentage.toFixed(1) + "%" : "N/A"),
+        margin,
+        nextY
+      );
+
+      doc.text("Status: " + status, margin, nextY + 7);
+
+      nextY += 17;
+
+      /* CATEGORY BREAKDOWN */
+      if (nextY > 245) {
+        doc.addPage();
+        nextY = 20;
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.setTextColor(20, 33, 61);
+      doc.text("Category Breakdown", margin, nextY);
+
+      const categoryRows = Object.entries(data.categories)
+        .sort((a, b) => b[1] - a[1])
+        .map(([category, amount]) => {
+          const percentage = data.spent > 0
+            ? (amount / data.spent) * 100
+            : 0;
+
+          return [
+            getCategoryName(category),
+            money(amount),
+            percentage.toFixed(1) + "%"
+          ];
+        });
+
+      doc.autoTable({
+        startY: nextY + 5,
+        head: [["Category", "Amount", "Share"]],
+        body: categoryRows.length
+          ? categoryRows
+          : [["No category data", "-", "-"]],
+        theme: "grid",
+        margin: { left: margin, right: margin },
+        styles: {
+          font: "helvetica",
+          fontSize: 9,
+          cellPadding: 3
+        },
+        headStyles: {
+          fillColor: [37, 99, 235],
+          textColor: 255
+        }
+      });
+
+      /* TRANSACTION HISTORY */
+      nextY = doc.lastAutoTable.finalY + 12;
+
+      if (nextY > 245) {
+        doc.addPage();
+        nextY = 20;
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(15);
+      doc.setTextColor(20, 33, 61);
+      doc.text("Transaction History", margin, nextY);
+
+      const transactionRows = data.expenses.map(expense => [
+        expense.date || "-",
+        expense.description || "-",
+        getCategoryName(expense.category || "other"),
+        money(expense.amount)
+      ]);
+
+      doc.autoTable({
+        startY: nextY + 5,
+        head: [["Date", "Description", "Category", "Amount"]],
+        body: transactionRows.length
+          ? transactionRows
+          : [["-", "No transactions found", "-", "-"]],
+        theme: "grid",
+        margin: {
+          left: margin,
+          right: margin,
+          bottom: 18
+        },
+        styles: {
+          font: "helvetica",
+          fontSize: 8,
+          cellPadding: 3,
+          overflow: "linebreak"
+        },
+        headStyles: {
+          fillColor: [37, 99, 235],
+          textColor: 255
+        },
+        columnStyles: {
+          0: { cellWidth: 27 },
+          1: { cellWidth: 65 },
+          2: { cellWidth: 40 },
+          3: { cellWidth: 45, halign: "right" }
+        }
+      });
+
+      /* FOOTER AND PAGE NUMBERS */
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(120, 130, 145);
+
+        doc.text(
+          "Generated by Kharcha | Personal Finance Management",
+          pageWidth / 2,
+          pageHeight - 8,
+          { align: "center" }
+        );
+
+        doc.text(
+          "Page " + i + " of " + pageCount,
+          pageWidth - margin,
+          pageHeight - 8,
+          { align: "right" }
+        );
+      }
+
+      doc.save("Kharcha-Report-" + data.month + ".pdf");
 
     } catch (error) {
       console.error("PDF generation error:", error);
-      alert("PDF generation failed. Please try again.");
+      alert("PDF generation failed. Please refresh and try again.");
     } finally {
-      if (exportElement) {
-        exportElement.remove();
-      }
-
       button.disabled = false;
       button.textContent = "Download PDF";
     }
